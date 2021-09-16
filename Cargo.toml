@@ -1,0 +1,12 @@
+[package]
+name = "net-adds"
+description = "Provides IP ranges, networks and iterators for Rust."
+version = "0.1.0"
+edition = "2018"
+license = "MIT"
+readme = "README.md"
+publish = false
+
+[lib]
+name = "net_adds"
+path = "src/lib.rs"

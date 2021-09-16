@@ -1,0 +1,6 @@
+# Common directories
+**/.directory
+
+# Cargo builds
+**/target
+**/*.rs.bk
