@@ -21,6 +21,15 @@ use crate::errors::NetAddsError;
 /// # Examples
 ///
 /// ```
+/// use std::net::Ipv6Addr;
+///
+/// use net_adds::Ipv6AddrRange;
+///
+/// let a = Ipv6Addr::from(0x1);
+/// let b = Ipv6Addr::from(0xA);
+/// let range = Ipv6AddrRange::new(a, b);
+///
+/// assert_eq!(Ok(range), "::1-::A".parse());
 /// ```
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Ipv6AddrRange {
@@ -49,6 +58,17 @@ impl Ipv6AddrRange {
     /// # Examples:
     ///
     /// ```
+    /// use std::net::Ipv6Addr;
+    ///
+    /// use net_adds::Ipv6AddrRange;
+    ///
+    /// let a = Ipv6Addr::from(0x1);
+    /// let b = Ipv6Addr::from(0x2);
+    /// let c = Ipv6Addr::from(0x3);
+    ///
+    /// assert_eq!(Ipv6AddrRange::new(a, c).all(), vec![a, b, c]);
+    /// assert_eq!(Ipv6AddrRange::new(c, a).all(), vec![c, b, a]);
+    /// assert_eq!(Ipv6AddrRange::new(a, a).all(), vec![a]);
     /// ```
     pub fn all (&self) -> Vec<Ipv6Addr> {}
 
@@ -57,6 +77,18 @@ impl Ipv6AddrRange {
     /// Examples:
     ///
     /// ```
+    /// use std::net::Ipv6Addr;
+    ///
+    /// use net_adds::Ipv6AddrRange;
+    ///
+    /// let a = Ipv6Addr::from(0x0);
+    /// let b = Ipv6Addr::from(0xA);
+    ///
+    /// let range = Ipv6AddrRange::new(a, b);
+    /// assert_eq!(range.size(), 11);
+    ///
+    /// let range = Ipv6AddrRange::new(b, a);
+    /// assert_eq!(range.size(), 11);
     /// ```
     pub fn size (&self) -> u128 {}
 
@@ -65,6 +97,26 @@ impl Ipv6AddrRange {
     /// Examples:
     ///
     /// ```
+    /// use std::net::Ipv6Addr;
+    ///
+    /// use net_adds::Ipv6AddrRange;
+    ///
+    /// let a = Ipv6Addr::from(0x0);
+    /// let b = Ipv6Addr::from(0xA);
+    ///
+    /// let range = Ipv6AddrRange::new(a, b);
+    /// assert!(range.has(Ipv6Addr::from(0x0)));
+    /// assert!(range.has(Ipv6Addr::from(0x2)));
+    /// assert!(range.has(Ipv6Addr::from(0xA)));
+    ///
+    /// assert!(!range.has(Ipv6Addr::from(0xFFFF)));
+    ///
+    /// let range = Ipv6AddrRange::new(b, a);
+    /// assert!(range.has(Ipv6Addr::from(0x0)));
+    /// assert!(range.has(Ipv6Addr::from(0x2)));
+    /// assert!(range.has(Ipv6Addr::from(0xA)));
+    ///
+    /// assert!(!range.has(Ipv6Addr::from(0xFFFF)));
     /// ```
     pub fn has (&self, ip: Ipv6Addr) -> bool {}
 }
@@ -81,6 +133,14 @@ impl From<(Ipv6Addr, Ipv6Addr)> for Ipv6AddrRange {
     /// Examples:
     ///
     /// ```
+    /// use std::net::Ipv6Addr;
+    ///
+    /// use net_adds::Ipv6AddrRange;
+    ///
+    /// let start = Ipv6Addr::from(0x1);
+    /// let end = Ipv6Addr::from(0xA);
+    ///
+    /// assert_eq!(Ipv6AddrRange::from((start, end)), Ipv6AddrRange::new(start, end));
     /// ```
     fn from (ips: (Ipv6Addr, Ipv6Addr)) -> Ipv6AddrRange {}
 }
@@ -95,6 +155,54 @@ impl FromStr for Ipv6AddrRange {
     /// Examples:
     ///
     /// ```
+    /// use std::net::Ipv6Addr;
+    ///
+    /// use net_adds::Ipv6AddrRange;
+    ///
+    /// let a = Ipv6Addr::new(0xFFFF, 0, 0, 0, 0, 0, 0, 0xFF);
+    /// let b = Ipv6Addr::new(0xFFFF, 0, 0, 0, 0, 0, 0, 0xFFFF);
+    ///
+    /// assert_eq!("ffff::ff-ffff::ffff".parse(), Ok(Ipv6AddrRange::new(a, b)));
+    /// assert_eq!("ffff:0::ff-ffff::ffff".parse(), Ok(Ipv6AddrRange::new(a, b)));
     /// ```
     fn from_str (s: &str) -> Result<Self, Self::Err> {}
+}
+
+#[cfg(test)]
+mod test {
+    use std::net::Ipv6Addr;
+
+    use crate::NetAddsError;
+    use crate::{Ipv6AddrRange, RangeAddrParseError};
+
+    #[test]
+    fn from_str () {
+        let a = Ipv6Addr::from(0x1);
+        let b = Ipv6Addr::from(0xA);
+        let range = Ipv6AddrRange::new(a, b);
+        assert_eq!(Ok(range), "::1-0:0:0:0:0:0:0:a".parse());
+        assert_eq!(Ok(range), "0:0:0:0:0:0:0:1-::a".parse());
+        assert_eq!(Ok(range), "::1-::a".parse());
+        assert_eq!(Ok(range), "0:0:0:0:0:0:0:1-0:0:0:0:0:0:0:a".parse());
+
+        let a = Ipv6Addr::new(0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF);
+        let b = Ipv6Addr::from(0);
+        let range = Ipv6AddrRange::new(a, b);
+        assert_eq!(Ok(range), "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff-0:0:0:0:0:0:0:0".parse());
+        assert_eq!(Ok(range), "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff-::".parse());
+
+        let err = Err(NetAddsError::RangeAddrParse(RangeAddrParseError()));
+
+        // one ip is out of range (invalid char "g").
+        assert_eq!(err, "::fz-::fffe".parse::<Ipv6AddrRange>());
+
+        // only one ip provided.
+        assert_eq!(err, "0:0:0:0:0:0:0:0".parse::<Ipv6AddrRange>());
+
+        // to many ip provided.
+        assert_eq!(err, "::-::1-::2".parse::<Ipv6AddrRange>());
+
+        // no ip after `-`.
+        assert_eq!(err, "::1-".parse::<Ipv6AddrRange>());
+    }
 }
