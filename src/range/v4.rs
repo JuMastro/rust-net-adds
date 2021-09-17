@@ -194,6 +194,9 @@ mod test {
         // to many ip provided.
         assert_eq!(err, "255.0.0.1-255.0.0.10-255.0.0.20".parse::<Ipv4AddrRange>());
 
+        // no ip before `-`.
+        assert_eq!(err, "-127.0.0.1".parse::<Ipv4AddrRange>());
+
         // no ip after `-`.
         assert_eq!(err, "127.0.0.1-".parse::<Ipv4AddrRange>());
     }

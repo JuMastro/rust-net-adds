@@ -279,6 +279,9 @@ mod test {
         // to many ip provided.
         assert_eq!(err, "255.0.0.1-255.0.0.10-255.0.0.20".parse::<IpAddrRange>());
 
+        // no ip before `-`.
+        assert_eq!(err, "-127.0.0.1".parse::<IpAddrRange>());
+
         // no ip after `-`.
         assert_eq!(err, "127.0.0.1-".parse::<IpAddrRange>());
 
@@ -299,7 +302,7 @@ mod test {
 
         let err = Err(NetAddsError::RangeAddrParse(RangeAddrParseError()));
 
-        // one ip is out of range (invalid char "g").
+        // one ip is out of range (invalid char "z").
         assert_eq!(err, "::fz-::fffe".parse::<Ipv6AddrRange>());
 
         // only one ip provided.
@@ -307,6 +310,9 @@ mod test {
 
         // to many ip provided.
         assert_eq!(err, "::-::1-::2".parse::<Ipv6AddrRange>());
+
+        // no ip before `-`.
+        assert_eq!(err, "-::1".parse::<Ipv6AddrRange>());
 
         // no ip after `-`.
         assert_eq!(err, "::1-".parse::<Ipv6AddrRange>());
