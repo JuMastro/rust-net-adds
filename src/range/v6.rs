@@ -3,6 +3,7 @@ use std::net::Ipv6Addr;
 use std::str::FromStr;
 
 use crate::errors::NetAddsError;
+use crate::range::RangeAddrParseError;
 
 /// An IPv6 address range.
 ///
@@ -70,7 +71,13 @@ impl Ipv6AddrRange {
     /// assert_eq!(Ipv6AddrRange::new(c, a).all(), vec![c, b, a]);
     /// assert_eq!(Ipv6AddrRange::new(a, a).all(), vec![a]);
     /// ```
-    pub fn all (&self) -> Vec<Ipv6Addr> {}
+    pub fn all (&self) -> Vec<Ipv6Addr> {
+        if self.start <= self.end {
+            (u128::from(self.start)..=u128::from(self.end)).map(Ipv6Addr::from).collect()
+        } else {
+            (u128::from(self.end)..=u128::from(self.start)).map(Ipv6Addr::from).rev().collect()
+        }
+    }
 
     /// Returns the number of ip's included in the range.
     ///
@@ -90,7 +97,15 @@ impl Ipv6AddrRange {
     /// let range = Ipv6AddrRange::new(b, a);
     /// assert_eq!(range.size(), 11);
     /// ```
-    pub fn size (&self) -> u128 {}
+    pub fn size (&self) -> u128 {
+        let start = u128::from(self.start());
+        let end = u128::from(self.end());
+        if start < end {
+            end - start + 1
+        } else {
+            start - end + 1
+        }
+    }
 
     /// Returns true if the ip argument is included in the range, else returns false.
     ///
@@ -118,7 +133,16 @@ impl Ipv6AddrRange {
     ///
     /// assert!(!range.has(Ipv6Addr::from(0xFFFF)));
     /// ```
-    pub fn has (&self, ip: Ipv6Addr) -> bool {}
+    pub fn has (&self, ip: Ipv6Addr) -> bool {
+        let needle = u128::from(ip);
+        let start = u128::from(self.start());
+        let end = u128::from(self.end());
+        if start < end {
+            needle >= start && needle <= end
+        } else {
+            needle >= end && needle <= start
+        }
+    }
 }
 
 impl fmt::Display for Ipv6AddrRange {
@@ -142,7 +166,9 @@ impl From<(Ipv6Addr, Ipv6Addr)> for Ipv6AddrRange {
     ///
     /// assert_eq!(Ipv6AddrRange::from((start, end)), Ipv6AddrRange::new(start, end));
     /// ```
-    fn from (ips: (Ipv6Addr, Ipv6Addr)) -> Ipv6AddrRange {}
+    fn from (ips: (Ipv6Addr, Ipv6Addr)) -> Ipv6AddrRange {
+        Ipv6AddrRange::new(ips.0, ips.1)
+    }
 }
 
 impl FromStr for Ipv6AddrRange {
@@ -165,7 +191,21 @@ impl FromStr for Ipv6AddrRange {
     /// assert_eq!("ffff::ff-ffff::ffff".parse(), Ok(Ipv6AddrRange::new(a, b)));
     /// assert_eq!("ffff:0::ff-ffff::ffff".parse(), Ok(Ipv6AddrRange::new(a, b)));
     /// ```
-    fn from_str (s: &str) -> Result<Self, Self::Err> {}
+    fn from_str (s: &str) -> Result<Self, Self::Err> {
+        let mut ips = s.split('-').map(|ip| {
+            Ipv6Addr::from_str(ip)
+                .map_err(|_| NetAddsError::RangeAddrParse(RangeAddrParseError()))
+        });
+
+        let a = ips.next();
+        let b = ips.next();
+
+        if a.is_none() || b.is_none() || ips.next().is_some() {
+            Err(NetAddsError::RangeAddrParse(RangeAddrParseError()))
+        } else {
+            Ok(Ipv6AddrRange::new(a.unwrap()?, b.unwrap()?))
+        }
+    }
 }
 
 #[cfg(test)]

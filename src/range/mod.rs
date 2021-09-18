@@ -46,10 +46,20 @@ pub enum IpAddrRange {
 
 impl IpAddrRange {
     /// Returns the first ip.
-    pub fn start (self) -> IpAddr {}
+    pub fn start (self) -> IpAddr {
+        match self {
+            IpAddrRange::V4(v4) => IpAddr::V4(v4.start()),
+            IpAddrRange::V6(v6) => IpAddr::V6(v6.start())
+        }
+    }
 
     /// Returns the last ip.
-    pub fn end (self) -> IpAddr {}
+    pub fn end (self) -> IpAddr {
+        match self {
+            IpAddrRange::V4(v4) => IpAddr::V4(v4.end()),
+            IpAddrRange::V6(v6) => IpAddr::V6(v6.end())
+        }
+    }
 
     /// Returns all ips included in the range.
     ///
@@ -80,7 +90,12 @@ impl IpAddrRange {
     ///     IpAddr::V6(a)
     /// ]);
     /// ```
-    pub fn all (&self) -> Vec<IpAddr> {}
+    pub fn all (&self) -> Vec<IpAddr> {
+        match self {
+            IpAddrRange::V4(rv4) => rv4.all().into_iter().map(IpAddr::V4).collect(),
+            IpAddrRange::V6(rv6) => rv6.all().into_iter().map(IpAddr::V6).collect()
+        }
+    }
 
     /// Returns the number of ip's included in the range.
     ///
@@ -97,7 +112,12 @@ impl IpAddrRange {
     /// let range = IpAddrRange::V6(Ipv6AddrRange::new(Ipv6Addr::from(0), Ipv6Addr::from(0xA)));
     /// assert_eq!(range.size(), 11);
     /// ```
-    pub fn size (&self) -> u128 {}
+    pub fn size (&self) -> u128 {
+        match self {
+            IpAddrRange::V4(v4) => u128::from(v4.size()),
+            IpAddrRange::V6(v6) => v6.size()
+        }
+    }
 
     /// Returns true if the ip argument is included in the range, else returns false.
     ///
@@ -124,7 +144,13 @@ impl IpAddrRange {
     ///
     /// assert!(!range.has(IpAddr::V6(Ipv6Addr::from(0xFFFF))));
     /// ```
-    pub fn has (&self, ip: IpAddr) -> bool {}
+    pub fn has (&self, ip: IpAddr) -> bool {
+        match (self, ip) {
+            (IpAddrRange::V4(v4), IpAddr::V4(ipv4)) => v4.has(ipv4),
+            (IpAddrRange::V6(v6), IpAddr::V6(ipv6)) => v6.has(ipv6),
+            _ => panic!("cannot mix IPv4 and IPv6 to check if range includes ip")
+        }
+    }
 
     /// Returns true if the range contains IPv4, else return false.
     ///
@@ -145,7 +171,12 @@ impl IpAddrRange {
     ///
     /// assert_eq!(IpAddrRange::V6(Ipv6AddrRange::new(a, b)).is_ipv4(), false);
     /// ```
-    pub fn is_ipv4 (&self) -> bool {}
+    pub fn is_ipv4 (&self) -> bool {
+        match self {
+            IpAddrRange::V4(_) => true,
+            IpAddrRange::V6(_) => false
+        }
+    }
 
     /// Returns true if the range contains IPv6, else return false.
     ///
@@ -166,7 +197,12 @@ impl IpAddrRange {
     ///
     /// assert_eq!(IpAddrRange::V4(Ipv4AddrRange::new(a, b)).is_ipv6(), false);
     /// ```
-    pub fn is_ipv6 (&self) -> bool {}
+    pub fn is_ipv6 (&self) -> bool {
+        match self {
+            IpAddrRange::V4(_) => false,
+            IpAddrRange::V6(_) => true
+        }
+    }
 }
 
 impl fmt::Display for IpAddrRange {
@@ -193,7 +229,9 @@ impl From<Ipv4AddrRange> for IpAddrRange {
     ///
     /// assert_eq!(IpAddrRange::from(Ipv4AddrRange::new(a, b)), IpAddrRange::V4(Ipv4AddrRange::new(a, b)));
     /// ```
-    fn from (range: Ipv4AddrRange) -> IpAddrRange {}
+    fn from (range: Ipv4AddrRange) -> IpAddrRange {
+        IpAddrRange::V4(range)
+    }
 }
 
 impl From<Ipv6AddrRange> for IpAddrRange {
@@ -211,7 +249,9 @@ impl From<Ipv6AddrRange> for IpAddrRange {
     /// let range = Ipv6AddrRange::new(a, b);
     /// assert_eq!(IpAddrRange::from(range), IpAddrRange::V6(range));
     /// ```
-    fn from (range: Ipv6AddrRange) -> IpAddrRange {}
+    fn from (range: Ipv6AddrRange) -> IpAddrRange {
+        IpAddrRange::V6(range)
+    }
 }
 
 impl FromStr for IpAddrRange {
@@ -236,7 +276,11 @@ impl FromStr for IpAddrRange {
     /// let range = IpAddrRange::V6(Ipv6AddrRange::new(a, b));
     /// assert_eq!("ffff::ff-ffff::ffff".parse(), Ok(range));
     /// ```
-    fn from_str (s: &str) -> Result<Self, Self::Err> {}
+    fn from_str (s: &str) -> Result<Self, Self::Err> {
+        Ipv4AddrRange::from_str(s)
+            .map(IpAddrRange::V4)
+            .or_else(move |_| Ipv6AddrRange::from_str(s).map(IpAddrRange::V6))
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
