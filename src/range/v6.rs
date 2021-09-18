@@ -120,6 +120,7 @@ impl Ipv6AddrRange {
     /// let b = Ipv6Addr::from(0xA);
     ///
     /// let range = Ipv6AddrRange::new(a, b);
+    ///
     /// assert!(range.has(Ipv6Addr::from(0x0)));
     /// assert!(range.has(Ipv6Addr::from(0x2)));
     /// assert!(range.has(Ipv6Addr::from(0xA)));
@@ -127,6 +128,7 @@ impl Ipv6AddrRange {
     /// assert!(!range.has(Ipv6Addr::from(0xFFFF)));
     ///
     /// let range = Ipv6AddrRange::new(b, a);
+    ///
     /// assert!(range.has(Ipv6Addr::from(0x0)));
     /// assert!(range.has(Ipv6Addr::from(0x2)));
     /// assert!(range.has(Ipv6Addr::from(0xA)));

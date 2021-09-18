@@ -120,6 +120,7 @@ impl Ipv4AddrRange {
     /// let b = Ipv4Addr::new(192, 168, 0, 255);
     ///
     /// let range = Ipv4AddrRange::new(a, b);
+    ///
     /// assert!(range.has(Ipv4Addr::new(192, 168, 0, 0)));
     /// assert!(range.has(Ipv4Addr::new(192, 168, 0, 142)));
     /// assert!(range.has(Ipv4Addr::new(192, 168, 0, 255)));
@@ -127,6 +128,7 @@ impl Ipv4AddrRange {
     /// assert!(!range.has(Ipv4Addr::new(192, 169, 0, 0)));
     ///
     /// let range = Ipv4AddrRange::new(b, a);
+    ///
     /// assert!(range.has(Ipv4Addr::new(192, 168, 0, 0)));
     /// assert!(range.has(Ipv4Addr::new(192, 168, 0, 142)));
     /// assert!(range.has(Ipv4Addr::new(192, 168, 0, 255)));

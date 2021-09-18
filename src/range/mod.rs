@@ -33,9 +33,11 @@ pub use v6::*;
 /// use net_adds::{IpAddrRange, Ipv4AddrRange, Ipv6AddrRange};
 ///
 /// let range = IpAddrRange::V4(Ipv4AddrRange::new(Ipv4Addr::new(192, 168, 0, 0), Ipv4Addr::new(192, 168, 0, 255)));
+///
 /// assert_eq!(Ok(range), "192.168.0.0-192.168.0.255".parse());
 ///
 /// let range = IpAddrRange::V6(Ipv6AddrRange::new(Ipv6Addr::from(0x1), Ipv6Addr::from(0xFFFF)));
+///
 /// assert_eq!(Ok(range), "::1-::ffff".parse());
 /// ```
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -131,6 +133,7 @@ impl IpAddrRange {
     /// use net_adds::{IpAddrRange, Ipv4AddrRange, Ipv6AddrRange};
     ///
     /// let range = IpAddrRange::V4(Ipv4AddrRange::new(Ipv4Addr::from(0), Ipv4Addr::from(0xA)));
+    ///
     /// assert!(range.has(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0))));
     /// assert!(range.has(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 5))));
     /// assert!(range.has(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 10))));
@@ -138,6 +141,7 @@ impl IpAddrRange {
     /// assert!(!range.has(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 11))));
     ///
     /// let range = IpAddrRange::V6(Ipv6AddrRange::new(Ipv6Addr::from(0), Ipv6Addr::from(0xA)));
+    ///
     /// assert!(range.has(IpAddr::V6(Ipv6Addr::from(0x1))));
     /// assert!(range.has(IpAddr::V6(Ipv6Addr::from(0x5))));
     /// assert!(range.has(IpAddr::V6(Ipv6Addr::from(0xA))));
@@ -247,6 +251,7 @@ impl From<Ipv6AddrRange> for IpAddrRange {
     /// let a = Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 0);
     /// let b = Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 0xa);
     /// let range = Ipv6AddrRange::new(a, b);
+    ///
     /// assert_eq!(IpAddrRange::from(range), IpAddrRange::V6(range));
     /// ```
     fn from (range: Ipv6AddrRange) -> IpAddrRange {
@@ -271,11 +276,13 @@ impl FromStr for IpAddrRange {
     /// let a = Ipv4Addr::new(192, 168, 0, 0);
     /// let b = Ipv4Addr::new(192, 168, 0, 255);
     /// let range = IpAddrRange::V4(Ipv4AddrRange::new(a, b));
+    ///
     /// assert_eq!("192.168.0.0-192.168.0.255".parse(), Ok(range));
     ///
     /// let a = Ipv6Addr::new(0xFFFF, 0, 0, 0, 0, 0, 0, 0xFF);
     /// let b = Ipv6Addr::new(0xFFFF, 0, 0, 0, 0, 0, 0, 0xFFFF);
     /// let range = IpAddrRange::V6(Ipv6AddrRange::new(a, b));
+    ///
     /// assert_eq!("ffff::ff-ffff::ffff".parse(), Ok(range));
     /// ```
     fn from_str (s: &str) -> Result<Self, Self::Err> {
