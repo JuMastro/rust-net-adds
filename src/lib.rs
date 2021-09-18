@@ -7,6 +7,9 @@ pub use errors::*;
 mod range;
 pub use range::{IpAddrRange, Ipv4AddrRange, Ipv6AddrRange};
 
+mod network;
+pub use network::{IpAddrNetwork, Ipv4AddrNetwork, Ipv6AddrNetwork};
+
 #[cfg(doctest)]
 mod test {
     mod readme {
