@@ -57,19 +57,44 @@ pub enum IpAddrNetwork {
 
 impl IpAddrNetwork {
     /// Returns the ip addr.
-    pub fn ip (self) -> IpAddr {}
+    pub fn ip (self) -> IpAddr {
+        match self {
+            IpAddrNetwork::V4(v4) => IpAddr::V4(v4.ip()),
+            IpAddrNetwork::V6(v6) => IpAddr::V6(v6.ip())
+        }
+    }
 
     /// Returns the netmask prefix.
-    pub fn prefix (self) -> u8 {}
+    pub fn prefix (self) -> u8 {
+        match self {
+            IpAddrNetwork::V4(v4) => v4.prefix(),
+            IpAddrNetwork::V6(v6) => v6.prefix()
+        }
+    }
 
     /// Returns the netmask addr.
-    pub fn netmask (self) -> IpAddr {}
+    pub fn netmask (self) -> IpAddr {
+        match self {
+            IpAddrNetwork::V4(v4) => IpAddr::V4(v4.netmask()),
+            IpAddrNetwork::V6(v6) => IpAddr::V6(v6.netmask())
+        }
+    }
 
     /// Returns the network addr.
-    pub fn network (self) -> IpAddr {}
+    pub fn network (self) -> IpAddr {
+        match self {
+            IpAddrNetwork::V4(v4) => IpAddr::V4(v4.network()),
+            IpAddrNetwork::V6(v6) => IpAddr::V6(v6.network())
+        }
+    }
 
     /// Returns the broadcast addr.
-    pub fn broadcast (self) -> IpAddr {}
+    pub fn broadcast (self) -> IpAddr {
+        match self {
+            IpAddrNetwork::V4(v4) => IpAddr::V4(v4.broadcast()),
+            IpAddrNetwork::V6(v6) => IpAddr::V6(v6.broadcast())
+        }
+    }
 
     /// Returns all ip of the network including the network and the broadcast addr.
     ///
@@ -98,7 +123,12 @@ impl IpAddrNetwork {
     ///     Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 3)
     /// ]);
     /// ```
-    pub fn all (self) -> Vec<IpAddr> {}
+    pub fn all (self) -> Vec<IpAddr> {
+        match self {
+            IpAddrNetwork::V4(v4) => v4.all().into_iter().map(IpAddr::V4).collect(),
+            IpAddrNetwork::V6(v6) => v6.all().into_iter().map(IpAddr::V6).collect()
+        }
+    }
 
     /// Returns all hosts (exclude network & broadcast addr).
     ///
@@ -123,7 +153,12 @@ impl IpAddrNetwork {
     ///     Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 2)
     /// ]);
     /// ```
-    pub fn hosts (self) -> Vec<IpAddr> {}
+    pub fn hosts (self) -> Vec<IpAddr> {
+        match self {
+            IpAddrNetwork::V4(v4) => v4.hosts().into_iter().map(IpAddr::V4).collect(),
+            IpAddrNetwork::V6(v6) => v6.hosts().into_iter().map(IpAddr::V6).collect()
+        }
+    }
 
     /// Returns the number of ip's included in the network including the network and the broadcast addr.
     ///
@@ -140,7 +175,12 @@ impl IpAddrNetwork {
     /// let network = IpAddrNetwork::V6(Ipv6AddrNetwork::try_new(Ipv6Addr::from(0x1), 120).unwrap());
     /// assert_eq!(network.size(), 256);
     /// ```
-    pub fn size (&self) -> u128 {}
+    pub fn size (&self) -> u128 {
+        match self {
+            IpAddrNetwork::V4(v4) => u128::from(v4.size()),
+            IpAddrNetwork::V6(v6) => v6.size()
+        }
+    }
 
     /// Returns true if the ip argument is included in the network, else returns false.
     ///
@@ -169,7 +209,13 @@ impl IpAddrNetwork {
     ///
     /// assert!(!network.has(IpAddr::V6(Ipv6Addr::from(0xFFFFFFFFFFFFFFFFFF00000000000000))));
     /// ```
-    pub fn has (&self, ip: IpAddr) -> bool {}
+    pub fn has (&self, ip: IpAddr) -> bool {
+        match (self, ip) {
+            (IpAddrNetwork::V4(v4), IpAddr::V4(iv4)) => v4.has(iv4),
+            (IpAddrNetwork::V6(v6), IpAddr::V6(iv6)) => v6.has(iv6),
+            _ => panic!("cannot mix IPv4 and IPv6 to check if network includes ip")
+        }
+    }
 
     /// Returns true if the network contains IPv4, else return false.
     ///
@@ -180,13 +226,18 @@ impl IpAddrNetwork {
     ///
     /// use net_adds::{IpAddrNetwork, Ipv4AddrNetwork, Ipv6AddrNetwork};
     ///
-    /// let network = IpAddrNetwork::V4(Ipv4AddrNetwork::try_new(Ipv4Addr::new(192, 162, 0, 10), 30).unwrap())
+    /// let network = IpAddrNetwork::V4(Ipv4AddrNetwork::try_new(Ipv4Addr::new(192, 162, 0, 10), 30).unwrap());
     /// assert!(network.is_ipv4());
     ///
     /// let network = IpAddrNetwork::V6(Ipv6AddrNetwork::try_new(Ipv6Addr::from(0x1), 126).unwrap());
     /// assert!(!network.is_ipv4());
     /// ```
-    pub fn is_ipv4 (&self) -> bool {}
+    pub fn is_ipv4 (&self) -> bool {
+        match self {
+            IpAddrNetwork::V4(_) => true,
+            IpAddrNetwork::V6(_) => false
+        }
+    }
 
     /// Returns true if the network contains IPv6, else return false.
     ///
@@ -203,7 +254,12 @@ impl IpAddrNetwork {
     /// let network = IpAddrNetwork::V4(Ipv4AddrNetwork::try_new(Ipv4Addr::new(192, 162, 0, 10), 30).unwrap());
     /// assert!(!network.is_ipv6());
     /// ```
-    pub fn is_ipv6 (&self) -> bool {}
+    pub fn is_ipv6 (&self) -> bool {
+        match self {
+            IpAddrNetwork::V4(_) => false,
+            IpAddrNetwork::V6(_) => true
+        }
+    }
 }
 
 impl fmt::Display for IpAddrNetwork {
@@ -229,7 +285,9 @@ impl From<Ipv4AddrNetwork> for IpAddrNetwork {
     ///
     /// assert_eq!(IpAddrNetwork::from(network), IpAddrNetwork::V4(network));
     /// ```
-    fn from (network: Ipv4AddrNetwork) -> IpAddrNetwork {}
+    fn from (network: Ipv4AddrNetwork) -> IpAddrNetwork {
+        IpAddrNetwork::V4(network)
+    }
 }
 
 impl From<Ipv6AddrNetwork> for IpAddrNetwork {
@@ -246,7 +304,9 @@ impl From<Ipv6AddrNetwork> for IpAddrNetwork {
     ///
     /// assert_eq!(IpAddrNetwork::from(network), IpAddrNetwork::V6(network));
     /// ```
-    fn from (network: Ipv6AddrNetwork) -> IpAddrNetwork {}
+    fn from (network: Ipv6AddrNetwork) -> IpAddrNetwork {
+        IpAddrNetwork::V6(network)
+    }
 }
 
 impl FromStr for IpAddrNetwork {
@@ -275,7 +335,11 @@ impl FromStr for IpAddrNetwork {
     /// assert_eq!(Ok(network), "ffff::ff/120".parse());
     /// assert_eq!(Ok(network), "ffff::ff/ffff:ffff:ffff:ffff:ffff:ffff:ffff:ff00".parse());
     /// ```
-    fn from_str (s: &str) -> Result<Self, Self::Err> {}
+    fn from_str (s: &str) -> Result<Self, Self::Err> {
+        Ipv4AddrNetwork::from_str(s)
+            .map(IpAddrNetwork::V4)
+            .or_else(move |_| Ipv6AddrNetwork::from_str(s).map(IpAddrNetwork::V6))
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]

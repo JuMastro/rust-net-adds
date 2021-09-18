@@ -1,9 +1,11 @@
 use std::convert::TryFrom;
 use std::fmt;
-use std::net::Ipv4Addr;
+use std::net::{IpAddr, Ipv4Addr};
 use std::str::FromStr;
 
 use crate::errors::NetAddsError;
+use crate::range::Ipv4AddrRange;
+use crate::network::{NetworkAddrParseError, InvalidNetmaskError, InvalidNetmaskPrefixError};
 
 /// An IPv4 address network.
 ///
@@ -56,12 +58,26 @@ impl Ipv4AddrNetwork {
     /// Returns an IPv4 network.
     ///
     /// If the netmask is not valid return an `NetAddsError::InvalidNetmaskPrefix(InvalidNetmaskPrefixError)`.
-    pub fn try_new (ip: Ipv4Addr, prefix: u8) -> Result<Ipv4AddrNetwork, NetAddsError> {}
+    pub fn try_new (ip: Ipv4Addr, prefix: u8) -> Result<Ipv4AddrNetwork, NetAddsError> {
+        let nu = Self::prefix_to_ip(prefix)?;
+        let iu = u32::from(ip);
+        let netmask = Ipv4Addr::from(nu);
+        let network = Ipv4Addr::from(iu & nu);
+        let broadcast = Ipv4Addr::from(iu | !nu);
+        Ok(Ipv4AddrNetwork { ip, prefix, netmask, network, broadcast })
+    }
 
     /// Returns an IPv4 network.
     ///
     /// If the netmask is not valid return an `NetAddsError::InvalidNetmask(InvalidNetmaskError)`.
-    pub fn try_new_with_addr (ip: Ipv4Addr, netmask: Ipv4Addr) -> Result<Ipv4AddrNetwork, NetAddsError> {}
+    pub fn try_new_with_addr (ip: Ipv4Addr, netmask: Ipv4Addr) -> Result<Ipv4AddrNetwork, NetAddsError> {
+        let iu = u32::from(ip);
+        let nu = u32::from(netmask);
+        let prefix = Self::ip_to_prefix(nu)?;
+        let network = Ipv4Addr::from(iu & nu);
+        let broadcast = Ipv4Addr::from(iu | !nu);
+        Ok(Ipv4AddrNetwork { ip, prefix, netmask, network, broadcast })
+    }
 
     /// Returns the ip addr.
     pub fn ip (self) -> Ipv4Addr {
@@ -106,7 +122,9 @@ impl Ipv4AddrNetwork {
     ///     Ipv4Addr::new(192, 168, 0, 11)
     /// ]);
     /// ```
-    pub fn all (&self) -> Vec<Ipv4Addr> {}
+    pub fn all (&self) -> Vec<Ipv4Addr> {
+        Ipv4AddrRange::new(self.network(), self.broadcast()).all()
+    }
 
     /// Returns all hosts (exclude network & broadcast addr).
     ///
@@ -124,7 +142,12 @@ impl Ipv4AddrNetwork {
     ///     Ipv4Addr::new(192, 168, 0, 10)
     /// ]);
     /// ```
-    pub fn hosts (&self) -> Vec<Ipv4Addr> {}
+    pub fn hosts (&self) -> Vec<Ipv4Addr> {
+        let mut ips = Ipv4AddrRange::new(self.network(), self.broadcast()).all();
+        ips.remove(0);
+        ips.pop();
+        ips
+    }
 
     /// Returns the number of ip's included in the network including the network and the broadcast addr.
     ///
@@ -139,7 +162,9 @@ impl Ipv4AddrNetwork {
     ///
     /// assert_eq!(network.size(), 256);
     /// ```
-    pub fn size (&self) -> u32 {}
+    pub fn size (&self) -> u32 {
+        u32::from(self.broadcast()) - u32::from(self.network()) + 1
+    }
 
     /// Returns true if the ip argument is included in the network, else returns false.
     ///
@@ -158,7 +183,12 @@ impl Ipv4AddrNetwork {
     ///
     /// assert!(!network.has(Ipv4Addr::new(192, 169, 0, 0)));
     /// ```
-    pub fn has (&self, ip: Ipv4Addr) -> bool {}
+    pub fn has (&self, ip: Ipv4Addr) -> bool {
+        let needle = u32::from(ip);
+        let network = u32::from(self.network());
+        let broadcast = u32::from(self.broadcast());
+        return needle >= network && needle <= broadcast
+    }
 
     /// Check the validity of a netmask under Ipv4Addr representation.
     ///
@@ -172,12 +202,18 @@ impl Ipv4AddrNetwork {
     /// use net_adds::Ipv4AddrNetwork;
     ///
     /// let netmask = Ipv4Addr::new(255, 255, 255, 0);
-    /// assert_eq!(Ipv4AddrNetwork::validate_netmask(u32::from(netmask)), Ok(24));
+    /// assert_eq!(Ipv4AddrNetwork::validate_netmask(u32::from(netmask)), Ok(u32::from(netmask)));
     ///
     /// let netmask = Ipv4Addr::new(0, 0, 0, 255);
     /// assert!(Ipv4AddrNetwork::validate_netmask(u32::from(netmask)).is_err());
     /// ```
-    pub fn validate_netmask (netmask: u32) -> Result<u32, NetAddsError> {}
+    pub fn validate_netmask (netmask: u32) -> Result<u32, NetAddsError> {
+        if netmask != 0 && (((!netmask + 1) & !netmask) != 0) {
+            Err(NetAddsError::InvalidNetmask(InvalidNetmaskError(IpAddr::V4(Ipv4Addr::from(netmask)))))
+        } else {
+            Ok(netmask)
+        }
+    }
 
     /// Check the validity of a netmask under CIDR prefix representation.
     ///
@@ -194,7 +230,13 @@ impl Ipv4AddrNetwork {
     ///
     /// assert!(Ipv4AddrNetwork::validate_prefix(33).is_err());
     /// ```
-    pub fn validate_prefix (prefix: u8) -> Result<u8, NetAddsError> {}
+    pub fn validate_prefix (prefix: u8) -> Result<u8, NetAddsError> {
+        if prefix > Self::MAX_SHORT_MASK_VALUE {
+            Err(NetAddsError::InvalidNetmaskPrefix(InvalidNetmaskPrefixError(prefix)))
+        } else {
+            Ok(prefix)
+        }
+    }
 
     /// Returns the Ipv4Addr representation of a CIDR prefix.
     ///
@@ -207,13 +249,23 @@ impl Ipv4AddrNetwork {
     ///
     /// use net_adds::Ipv4AddrNetwork;
     ///
+    /// assert_eq!(Ipv4AddrNetwork::prefix_to_ip(0), Ok(0));
     /// assert_eq!(Ipv4AddrNetwork::prefix_to_ip(32), Ok(u32::MAX));
     ///
     /// assert!(Ipv4AddrNetwork::prefix_to_ip(33).is_err());
     /// ```
-    pub fn prefix_to_ip (prefix: u8) -> Result<u32, NetAddsError> {}
+    pub fn prefix_to_ip (prefix: u8) -> Result<u32, NetAddsError> {
+        if Self::validate_prefix(prefix)? == 0 {
+            Ok(0)
+        } else {
+            Ok((u32::MAX << (32 - prefix)) & u32::MAX)
+        }
+    }
 
     /// Returns the CIDR prefix representation of an Ipv4Addr.
+    ///
+    /// We count the bit that are equals to 0 by shifting the sequence to the right (bitwise >>).
+    /// Then we subtract the number of bits equal to 0 from the maximum number of bits available on the netmask.
     ///
     /// If the netmask is not valid return an `NetAddsError::InvalidNetmask(InvalidNetmaskError)`.
     ///
@@ -224,11 +276,24 @@ impl Ipv4AddrNetwork {
     ///
     /// use net_adds::Ipv4AddrNetwork;
     ///
+    /// assert_eq!(Ipv4AddrNetwork::ip_to_prefix(u32::from(Ipv4Addr::new(0, 0, 0, 0))), Ok(0));
     /// assert_eq!(Ipv4AddrNetwork::ip_to_prefix(u32::from(Ipv4Addr::new(255, 255, 255, 255))), Ok(32));
     ///
     /// assert!(Ipv4AddrNetwork::ip_to_prefix(u32::from(Ipv4Addr::new(0, 255, 255, 255))).is_err());
     /// ```
-    pub fn ip_to_prefix (ip: u32) -> Result<u8, NetAddsError> {}
+    pub fn ip_to_prefix (ip: u32) -> Result<u8, NetAddsError> {
+        if Self::validate_netmask(ip)? == 0 {
+            Ok(0)
+        } else {
+            let mut tmp = ip.clone();
+            let mut bits = 0;
+            while (tmp & 0x1) == 0 {
+                tmp = tmp >> 1;
+                bits = bits + 1;
+            }
+            Ok(u8::try_from(Self::MAX_SHORT_MASK_VALUE - bits).unwrap())
+        }
+    }
 }
 
 impl fmt::Display for Ipv4AddrNetwork {
@@ -258,7 +323,9 @@ impl TryFrom<(Ipv4Addr, u8)> for Ipv4AddrNetwork {
     ///
     /// assert!(Ipv4AddrNetwork::try_from((ip, 33)).is_err());
     /// ```
-    fn try_from ((ip, prefix): (Ipv4Addr, u8)) -> Result<Ipv4AddrNetwork, Self::Error> {}
+    fn try_from ((ip, prefix): (Ipv4Addr, u8)) -> Result<Ipv4AddrNetwork, Self::Error> {
+        Ipv4AddrNetwork::try_new(ip, prefix)
+    }
 }
 
 impl TryFrom<(Ipv4Addr, Ipv4Addr)> for Ipv4AddrNetwork {
@@ -282,7 +349,9 @@ impl TryFrom<(Ipv4Addr, Ipv4Addr)> for Ipv4AddrNetwork {
     /// let netmask = Ipv4Addr::new(255, 255, 117, 0);
     /// assert!(Ipv4AddrNetwork::try_from((ip, netmask)).is_err());
     /// ```
-    fn try_from (ips: (Ipv4Addr, Ipv4Addr)) -> Result<Ipv4AddrNetwork, Self::Error> {}
+    fn try_from (ips: (Ipv4Addr, Ipv4Addr)) -> Result<Ipv4AddrNetwork, Self::Error> {
+        Ipv4AddrNetwork::try_new_with_addr(ips.0, ips.1)
+    }
 }
 
 impl FromStr for Ipv4AddrNetwork {
@@ -304,7 +373,28 @@ impl FromStr for Ipv4AddrNetwork {
     /// assert_eq!("192.168.0.10/24".parse(), network);
     /// assert_eq!("192.168.0.10/255.255.255.0".parse(), network);
     /// ```
-    fn from_str (s: &str) -> Result<Self, Self::Err> {}
+    fn from_str (s: &str) -> Result<Self, Self::Err> {
+        let mut parts = s.split('/');
+
+        let ip = parts.next().map(|part| {
+            Ipv4Addr::from_str(part)
+                .map_err(|_| NetAddsError::NetworkAddrParse(NetworkAddrParseError()))
+        });
+
+        let netmask = parts.next().map(|part| {
+            Ipv4Addr::from_str(part).or(
+                part.parse::<u8>()
+                    .map_err(|_| NetAddsError::NetworkAddrParse(NetworkAddrParseError()))
+                    .and_then(|prefix| Ok(Ipv4Addr::from(Self::prefix_to_ip(prefix)?)))
+            )
+        });
+
+        if ip.is_none() || netmask.is_none() || parts.next().is_some() {
+            Err(NetAddsError::NetworkAddrParse(NetworkAddrParseError()))
+        } else {
+            Ipv4AddrNetwork::try_new_with_addr(ip.unwrap()?, netmask.unwrap()?)
+        }
+    }
 }
 
 #[cfg(test)]
