@@ -15,14 +15,30 @@ use crate::errors::NetAddsError;
 /// # Textual representation
 ///
 /// `Ipv4AddrNetwork` provides a [`FromStr`] implementation. The two parts are divided by `/`.
-///  The first part must contain an IPv4. The second part can either contain an IPv4 or an u8 between
-///  0 and 32 which is valid as a netmask prefix.
+///  The first part must contain an IPv4. The second part can either contain an IPv4 or an u8
+/// between 0 and 32 which is valid as a netmask prefix.
 ///
 /// [`FromStr`]: std::str::FromStr
 ///
 /// # Examples
 ///
 /// ```
+/// use std::net::Ipv4Addr;
+///
+/// use net_adds::Ipv4AddrNetwork;
+///
+/// let ip = Ipv4Addr::new(192, 168, 0, 10);
+/// let network = Ipv4AddrNetwork::try_new(ip, 24).unwrap();
+///
+/// assert_eq!(Ok(network), "192.168.0.10/255.255.255.0".parse());
+/// assert_eq!(Ok(network), "192.168.0.10/24".parse());
+///
+/// let netmask = Ipv4Addr::new(255, 255, 255, 0);
+/// let networkb = Ipv4AddrNetwork::try_new_with_addr(ip, netmask).unwrap();
+///
+/// assert_eq!(networkb, network);
+/// assert_eq!(Ok(networkb), "192.168.0.10/255.255.255.0".parse());
+/// assert_eq!(Ok(networkb), "192.168.0.10/24".parse());
 /// ```
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Ipv4AddrNetwork {
@@ -77,6 +93,18 @@ impl Ipv4AddrNetwork {
     /// Examples:
     ///
     /// ```
+    /// use std::net::Ipv4Addr;
+    ///
+    /// use net_adds::Ipv4AddrNetwork;
+    ///
+    /// let network = Ipv4AddrNetwork::try_new(Ipv4Addr::new(192, 168, 0, 10), 30).unwrap();
+    ///
+    /// assert_eq!(network.all(), vec![
+    ///     Ipv4Addr::new(192, 168, 0, 8),
+    ///     Ipv4Addr::new(192, 168, 0, 9),
+    ///     Ipv4Addr::new(192, 168, 0, 10),
+    ///     Ipv4Addr::new(192, 168, 0, 11)
+    /// ]);
     /// ```
     pub fn all (&self) -> Vec<Ipv4Addr> {}
 
@@ -85,6 +113,16 @@ impl Ipv4AddrNetwork {
     /// Examples:
     ///
     /// ```
+    /// use std::net::Ipv4Addr;
+    ///
+    /// use net_adds::Ipv4AddrNetwork;
+    ///
+    /// let network = Ipv4AddrNetwork::try_new(Ipv4Addr::new(192, 168, 0, 10), 30).unwrap();
+    ///
+    /// assert_eq!(network.hosts(), vec![
+    ///     Ipv4Addr::new(192, 168, 0, 9),
+    ///     Ipv4Addr::new(192, 168, 0, 10)
+    /// ]);
     /// ```
     pub fn hosts (&self) -> Vec<Ipv4Addr> {}
 
@@ -93,6 +131,13 @@ impl Ipv4AddrNetwork {
     /// Examples:
     ///
     /// ```
+    /// use std::net::Ipv4Addr;
+    ///
+    /// use net_adds::Ipv4AddrNetwork;
+    ///
+    /// let network = Ipv4AddrNetwork::try_new(Ipv4Addr::new(192, 168, 0, 10), 24).unwrap();
+    ///
+    /// assert_eq!(network.size(), 256);
     /// ```
     pub fn size (&self) -> u32 {}
 
@@ -101,6 +146,17 @@ impl Ipv4AddrNetwork {
     /// Examples:
     ///
     /// ```
+    /// use std::net::Ipv4Addr;
+    ///
+    /// use net_adds::Ipv4AddrNetwork;
+    ///
+    /// let network = Ipv4AddrNetwork::try_new(Ipv4Addr::new(192, 168, 0, 10), 24).unwrap();
+    ///
+    /// assert!(network.has(Ipv4Addr::new(192, 168, 0, 0)));
+    /// assert!(network.has(Ipv4Addr::new(192, 168, 0, 142)));
+    /// assert!(network.has(Ipv4Addr::new(192, 168, 0, 255)));
+    ///
+    /// assert!(!network.has(Ipv4Addr::new(192, 169, 0, 0)));
     /// ```
     pub fn has (&self, ip: Ipv4Addr) -> bool {}
 
@@ -111,6 +167,15 @@ impl Ipv4AddrNetwork {
     /// Examples:
     ///
     /// ```
+    /// use std::net::Ipv4Addr;
+    ///
+    /// use net_adds::Ipv4AddrNetwork;
+    ///
+    /// let netmask = Ipv4Addr::new(255, 255, 255, 0);
+    /// assert_eq!(Ipv4AddrNetwork::validate_netmask(u32::from(netmask)), Ok(24));
+    ///
+    /// let netmask = Ipv4Addr::new(0, 0, 0, 255);
+    /// assert!(Ipv4AddrNetwork::validate_netmask(u32::from(netmask)).is_err());
     /// ```
     pub fn validate_netmask (netmask: u32) -> Result<u32, NetAddsError> {}
 
@@ -121,6 +186,13 @@ impl Ipv4AddrNetwork {
     /// Examples:
     ///
     /// ```
+    /// use std::net::Ipv4Addr;
+    ///
+    /// use net_adds::Ipv4AddrNetwork;
+    ///
+    /// assert_eq!(Ipv4AddrNetwork::validate_prefix(32), Ok(32));
+    ///
+    /// assert!(Ipv4AddrNetwork::validate_prefix(33).is_err());
     /// ```
     pub fn validate_prefix (prefix: u8) -> Result<u8, NetAddsError> {}
 
@@ -131,6 +203,13 @@ impl Ipv4AddrNetwork {
     /// Examples:
     ///
     /// ```
+    /// use std::net::Ipv4Addr;
+    ///
+    /// use net_adds::Ipv4AddrNetwork;
+    ///
+    /// assert_eq!(Ipv4AddrNetwork::prefix_to_ip(32), Ok(u32::MAX));
+    ///
+    /// assert!(Ipv4AddrNetwork::prefix_to_ip(33).is_err());
     /// ```
     pub fn prefix_to_ip (prefix: u8) -> Result<u32, NetAddsError> {}
 
@@ -141,6 +220,13 @@ impl Ipv4AddrNetwork {
     /// Examples:
     ///
     /// ```
+    /// use std::net::Ipv4Addr;
+    ///
+    /// use net_adds::Ipv4AddrNetwork;
+    ///
+    /// assert_eq!(Ipv4AddrNetwork::ip_to_prefix(u32::from(Ipv4Addr::new(255, 255, 255, 255))), Ok(32));
+    ///
+    /// assert!(Ipv4AddrNetwork::ip_to_prefix(u32::from(Ipv4Addr::new(0, 255, 255, 255))).is_err());
     /// ```
     pub fn ip_to_prefix (ip: u32) -> Result<u8, NetAddsError> {}
 }
@@ -161,6 +247,16 @@ impl TryFrom<(Ipv4Addr, u8)> for Ipv4AddrNetwork {
     /// Examples:
     ///
     /// ```
+    /// use std::convert::TryFrom;
+    /// use std::net::Ipv4Addr;
+    ///
+    /// use net_adds::Ipv4AddrNetwork;
+    ///
+    /// let ip = Ipv4Addr::new(192, 168, 0, 10);
+    ///
+    /// assert_eq!(Ipv4AddrNetwork::try_from((ip, 24)), Ipv4AddrNetwork::try_new(ip, 24));
+    ///
+    /// assert!(Ipv4AddrNetwork::try_from((ip, 33)).is_err());
     /// ```
     fn try_from ((ip, prefix): (Ipv4Addr, u8)) -> Result<Ipv4AddrNetwork, Self::Error> {}
 }
@@ -173,6 +269,18 @@ impl TryFrom<(Ipv4Addr, Ipv4Addr)> for Ipv4AddrNetwork {
     /// Examples:
     ///
     /// ```
+    /// use std::convert::TryFrom;
+    /// use std::net::Ipv4Addr;
+    ///
+    /// use net_adds::Ipv4AddrNetwork;
+    ///
+    /// let ip = Ipv4Addr::new(192, 168, 0, 10);
+    ///
+    /// let netmask = Ipv4Addr::new(255, 255, 255, 0);
+    /// assert_eq!(Ipv4AddrNetwork::try_from((ip, netmask)), Ipv4AddrNetwork::try_new(ip, 24));
+    ///
+    /// let netmask = Ipv4Addr::new(255, 255, 117, 0);
+    /// assert!(Ipv4AddrNetwork::try_from((ip, netmask)).is_err());
     /// ```
     fn try_from (ips: (Ipv4Addr, Ipv4Addr)) -> Result<Ipv4AddrNetwork, Self::Error> {}
 }
@@ -187,6 +295,62 @@ impl FromStr for Ipv4AddrNetwork {
     /// Examples:
     ///
     /// ```
+    /// use std::net::Ipv4Addr;
+    ///
+    /// use net_adds::Ipv4AddrNetwork;
+    ///
+    /// let network = Ipv4AddrNetwork::try_new(Ipv4Addr::new(192, 168, 0, 10), 24);
+    ///
+    /// assert_eq!("192.168.0.10/24".parse(), network);
+    /// assert_eq!("192.168.0.10/255.255.255.0".parse(), network);
     /// ```
     fn from_str (s: &str) -> Result<Self, Self::Err> {}
+}
+
+#[cfg(test)]
+mod test {
+    use std::net::Ipv4Addr;
+
+    use crate::{Ipv4AddrNetwork, NetAddsError, NetworkAddrParseError, InvalidNetmaskPrefixError};
+
+    #[test]
+    fn from_str () {
+        let ip = Ipv4Addr::new(192, 168, 0, 10);
+
+        let network = Ipv4AddrNetwork::try_new(ip, 0);
+        assert_eq!(network, "192.168.0.10/0".parse());
+        assert_eq!(network, "192.168.0.10/0.0.0.0".parse());
+
+        let network = Ipv4AddrNetwork::try_new(ip, 24);
+        assert_eq!(network, "192.168.0.10/24".parse());
+        assert_eq!(network, "192.168.0.10/255.255.255.0".parse());
+
+        let network = Ipv4AddrNetwork::try_new(ip, 32);
+        assert_eq!(network, "192.168.0.10/32".parse());
+        assert_eq!(network, "192.168.0.10/255.255.255.255".parse());
+
+        // invalid prefix.
+        let err = Err(NetAddsError::InvalidNetmaskPrefix(InvalidNetmaskPrefixError(33)));
+        assert_eq!(err, "0.0.0.1/33".parse::<Ipv4AddrNetwork>());
+
+        let err = Err(NetAddsError::NetworkAddrParse(NetworkAddrParseError()));
+
+        // ip is out of range.
+        assert_eq!(err, "256.0.0.1/24".parse::<Ipv4AddrNetwork>());
+
+        // ip is to short.
+        assert_eq!(err, "127.0.0/24".parse::<Ipv4AddrNetwork>());
+
+        // no netmask.
+        assert_eq!(err, "127.0.0.1".parse::<Ipv4AddrNetwork>());
+
+        // too many ip.
+        assert_eq!(err, "255.0.0.1/255.255.255.0/255.255.255.0".parse::<Ipv4AddrNetwork>());
+
+        // no ip before `/`.
+        assert_eq!(err, "/24".parse::<Ipv4AddrNetwork>());
+
+        // no netmask after `/`.
+        assert_eq!(err, "127.0.0.1/".parse::<Ipv4AddrNetwork>());
+    }
 }
