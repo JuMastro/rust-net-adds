@@ -259,6 +259,8 @@ impl FromStr for IpAddrRange {
 
     /// Parse a string as `IpAddrRange`.
     ///
+    /// If the string representation is not valid return an `NetAddsError::RangeAddrParse(RangeAddrParseError)`.
+    ///
     /// Examples:
     ///
     /// ```
