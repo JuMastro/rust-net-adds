@@ -16,15 +16,12 @@ pub use socket::*;
 /// By implementing `IntoSmartIterator` for a type, you define how it will be converted to an smart iterator.
 ///
 /// This is common for types which describe a followed collection of some kind.
-pub trait IntoSmartIterator<T> {
+pub trait IntoSmartIterator {
     /// The type of the elements being iterated over.
     type Item;
 
     /// Which kind of iterator are we turning this into?
     type IntoSmartIter: Iterator;
-
-    /// Transform the ouput.
-    fn transform (self) -> T;
 
     /// Creates an iterator from the current struct.
     fn into_smart_iter (self) -> Self::IntoSmartIter;
