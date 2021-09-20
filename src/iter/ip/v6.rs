@@ -8,6 +8,26 @@ use std::net::Ipv6Addr;
 /// # Examples
 ///
 /// ```
+/// use std::net::Ipv6Addr;
+///
+/// use net_adds::Ipv6AddrSmartIterator;
+///
+/// let mut iter = Ipv6AddrSmartIterator::new(Ipv6Addr::from(0), Ipv6Addr::from(1));
+///
+/// assert_eq!(iter.next(), Some(Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 0)));
+/// assert_eq!(iter.next(), Some(Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 1)));
+/// assert_eq!(iter.next(), None);
+///
+/// let mut iter = Ipv6AddrSmartIterator::new(Ipv6Addr::from(0), Ipv6Addr::from(0));
+///
+/// assert_eq!(iter.next(), Some(Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 0)));
+/// assert_eq!(iter.next(), None);
+///
+/// let mut iter = Ipv6AddrSmartIterator::new(Ipv6Addr::from(1), Ipv6Addr::from(0));
+///
+/// assert_eq!(iter.next(), Some(Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 1)));
+/// assert_eq!(iter.next(), Some(Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 0)));
+/// assert_eq!(iter.next(), None);
 /// ```
 #[derive(Clone, Debug)]
 pub struct Ipv6AddrSmartIterator {
@@ -41,6 +61,15 @@ impl From<(Ipv6Addr, Ipv6Addr)> for Ipv6AddrSmartIterator {
     /// Examples:
     ///
     /// ```
+    /// use std::net::Ipv6Addr;
+    ///
+    /// use net_adds::Ipv6AddrSmartIterator;
+    ///
+    /// let mut iter = Ipv6AddrSmartIterator::from((Ipv6Addr::from(0), Ipv6Addr::from(1)));
+    ///
+    /// assert_eq!(iter.next(), Some(Ipv6Addr::from(0)));
+    /// assert_eq!(iter.next(), Some(Ipv6Addr::from(1)));
+    /// assert_eq!(iter.next(), None);
     /// ```
     fn from (ips: (Ipv6Addr, Ipv6Addr)) -> Ipv6AddrSmartIterator {}
 }

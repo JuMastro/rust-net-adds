@@ -7,6 +7,25 @@ use std::fmt;
 /// # Examples
 /// 
 /// ```
+/// use net_adds::PortSmartIterator;
+///
+/// let mut iter = PortSmartIterator::new(0, 2);
+///
+/// assert_eq!(iter.next(), Some(0));
+/// assert_eq!(iter.next(), Some(1));
+/// assert_eq!(iter.next(), Some(2));
+/// assert_eq!(iter.next(), None);
+///
+/// let mut iter = PortSmartIterator::new(0, 0);
+///
+/// assert_eq!(iter.next(), Some(0));
+/// assert_eq!(iter.next(), None);
+/// 
+/// let mut iter = PortSmartIterator::new(1, 0);
+///
+/// assert_eq!(iter.next(), Some(1));
+/// assert_eq!(iter.next(), Some(0));
+/// assert_eq!(iter.next(), None);
 /// ```
 #[derive(Clone, Debug)]
 pub struct PortSmartIterator {

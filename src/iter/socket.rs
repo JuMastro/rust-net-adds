@@ -10,6 +10,38 @@ use crate::iter::PortSmartIterator;
 /// # Examples
 ///
 /// ```
+/// use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
+///
+/// use net_adds::SocketAddrIterator;
+///
+/// let ips = &[Ipv4Addr::from(0)];
+/// let mut iter = SocketAddrIterator::new(ips, &[0]);
+///
+/// assert_eq!(iter.next(), Some(SocketAddr::new(IpAddr::V4(Ipv4Addr::from(0)), 0)));
+/// assert_eq!(iter.next(), None);
+///
+/// let ips = &[Ipv6Addr::from(0), Ipv6Addr::from(1)];
+/// let mut iter = SocketAddrIterator::new(ips, &[0]);
+///
+/// assert_eq!(iter.next(), Some(SocketAddr::new(IpAddr::V6(Ipv6Addr::from(0)), 0)));
+/// assert_eq!(iter.next(), Some(SocketAddr::new(IpAddr::V6(Ipv6Addr::from(1)), 0)));
+/// assert_eq!(iter.next(), None);
+///
+/// let ips = &[Ipv4Addr::from(0)];
+/// let mut iter = SocketAddrIterator::new(ips, &[0, 1]);
+///
+/// assert_eq!(iter.next(), Some(SocketAddr::new(IpAddr::V4(Ipv4Addr::from(0)), 0)));
+/// assert_eq!(iter.next(), Some(SocketAddr::new(IpAddr::V4(Ipv4Addr::from(0)), 1)));
+/// assert_eq!(iter.next(), None);
+///
+/// let ips = &[Ipv6Addr::from(0), Ipv6Addr::from(1)];
+/// let mut iter = SocketAddrIterator::new(ips, &[0, 1]);
+///
+/// assert_eq!(iter.next(), Some(SocketAddr::new(IpAddr::V6(Ipv6Addr::from(0)), 0)));
+/// assert_eq!(iter.next(), Some(SocketAddr::new(IpAddr::V6(Ipv6Addr::from(0)), 1)));
+/// assert_eq!(iter.next(), Some(SocketAddr::new(IpAddr::V6(Ipv6Addr::from(1)), 0)));
+/// assert_eq!(iter.next(), Some(SocketAddr::new(IpAddr::V6(Ipv6Addr::from(1)), 1)));
+/// assert_eq!(iter.next(), None);
 /// ```
 #[derive(Clone, Debug)]
 pub struct SocketAddrIterator<'a, Ip> {
@@ -37,6 +69,40 @@ impl<'a, I> Iterator for SocketAddrIterator<'a, I> {
 /// # Examples
 ///
 /// ```
+/// use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
+///
+/// use net_adds::{IpAddrSmartIterator, Ipv4AddrSmartIterator, Ipv6AddrSmartIterator, SocketAddrSmartIterator};
+///
+/// let mut iter = SocketAddrSmartIterator::<Ipv4AddrSmartIterator, _>::new(Ipv4Addr::from(0), Ipv4Addr::from(0), 0, 0);
+///
+/// assert_eq!(iter.next(), Some(SocketAddr::new(IpAddr::V4(Ipv4Addr::from(0)), 0)));
+/// assert_eq!(iter.next(), None);
+///
+/// let mut iter = SocketAddrSmartIterator::<Ipv6AddrSmartIterator, _>::new(Ipv6Addr::from(0), Ipv6Addr::from(1), 0, 0);
+///
+/// assert_eq!(iter.next(), Some(SocketAddr::new(IpAddr::V6(Ipv6Addr::from(0)), 0)));
+/// assert_eq!(iter.next(), Some(SocketAddr::new(IpAddr::V6(Ipv6Addr::from(1)), 0)));
+/// assert_eq!(iter.next(), None);
+///
+/// let mut iter = SocketAddrSmartIterator::<IpAddrSmartIterator, _>::new(IpAddr::V4(Ipv4Addr::from(0)), IpAddr::V4(Ipv4Addr::from(0)), 0, 1);
+///
+/// assert_eq!(iter.next(), Some(SocketAddr::new(IpAddr::V4(Ipv4Addr::from(0)), 0)));
+/// assert_eq!(iter.next(), Some(SocketAddr::new(IpAddr::V4(Ipv4Addr::from(0)), 1)));
+/// assert_eq!(iter.next(), None);
+///
+/// let mut iter = SocketAddrSmartIterator::<Ipv4AddrSmartIterator, _>::new(Ipv4Addr::from(0), Ipv4Addr::from(0), 0, 1);
+///
+/// assert_eq!(iter.next(), Some(SocketAddr::new(IpAddr::V4(Ipv4Addr::from(0)), 0)));
+/// assert_eq!(iter.next(), Some(SocketAddr::new(IpAddr::V4(Ipv4Addr::from(0)), 1)));
+/// assert_eq!(iter.next(), None);
+///
+/// let mut iter = SocketAddrSmartIterator::<Ipv6AddrSmartIterator, _>::new(Ipv6Addr::from(0), Ipv6Addr::from(1), 0, 1);
+///
+/// assert_eq!(iter.next(), Some(SocketAddr::new(IpAddr::V6(Ipv6Addr::from(0)), 0)));
+/// assert_eq!(iter.next(), Some(SocketAddr::new(IpAddr::V6(Ipv6Addr::from(0)), 1)));
+/// assert_eq!(iter.next(), Some(SocketAddr::new(IpAddr::V6(Ipv6Addr::from(1)), 0)));
+/// assert_eq!(iter.next(), Some(SocketAddr::new(IpAddr::V6(Ipv6Addr::from(1)), 1)));
+/// assert_eq!(iter.next(), None);
 /// ```
 #[derive(Clone, Debug)]
 pub struct SocketAddrSmartIterator<It, Ip> {

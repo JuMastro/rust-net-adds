@@ -8,6 +8,26 @@ use std::net::Ipv4Addr;
 /// # Examples
 ///
 /// ```
+/// use std::net::Ipv4Addr;
+///
+/// use net_adds::Ipv4AddrSmartIterator;
+///
+/// let mut iter = Ipv4AddrSmartIterator::new(Ipv4Addr::from(0), Ipv4Addr::from(1));
+///
+/// assert_eq!(iter.next(), Some(Ipv4Addr::new(0, 0, 0, 0)));
+/// assert_eq!(iter.next(), Some(Ipv4Addr::new(0, 0, 0, 1)));
+/// assert_eq!(iter.next(), None);
+///
+/// let mut iter = Ipv4AddrSmartIterator::new(Ipv4Addr::from(0), Ipv4Addr::from(0));
+///
+/// assert_eq!(iter.next(), Some(Ipv4Addr::new(0, 0, 0, 0)));
+/// assert_eq!(iter.next(), None);
+///
+/// let mut iter = Ipv4AddrSmartIterator::new(Ipv4Addr::from(1), Ipv4Addr::from(0));
+///
+/// assert_eq!(iter.next(), Some(Ipv4Addr::new(0, 0, 0, 1)));
+/// assert_eq!(iter.next(), Some(Ipv4Addr::new(0, 0, 0, 0)));
+/// assert_eq!(iter.next(), None);
 /// ```
 #[derive(Clone, Debug)]
 pub struct Ipv4AddrSmartIterator {
@@ -41,6 +61,15 @@ impl From<(Ipv4Addr, Ipv4Addr)> for Ipv4AddrSmartIterator {
     /// Examples:
     ///
     /// ```
+    /// use std::net::Ipv4Addr;
+    ///
+    /// use net_adds::Ipv4AddrSmartIterator;
+    ///
+    /// let mut iter = Ipv4AddrSmartIterator::from((Ipv4Addr::from(0), Ipv4Addr::from(1)));
+    ///
+    /// assert_eq!(iter.next(), Some(Ipv4Addr::from(0)));
+    /// assert_eq!(iter.next(), Some(Ipv4Addr::from(1)));
+    /// assert_eq!(iter.next(), None);
     /// ```
     fn from (ips: (Ipv4Addr, Ipv4Addr)) -> Ipv4AddrSmartIterator {}
 }
