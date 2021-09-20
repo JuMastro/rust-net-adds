@@ -59,8 +59,8 @@ impl Ipv6AddrNetwork {
     ///
     /// If the netmask is not valid return an `NetAddsError::InvalidNetmaskPrefix(InvalidNetmaskPrefixError)`.
     pub fn try_new (ip: Ipv6Addr, prefix: u8) -> Result<Ipv6AddrNetwork, NetAddsError> {
-        let nu = Self::prefix_to_ip(prefix)?;
         let iu = u128::from(ip);
+        let nu = Self::prefix_to_ip(prefix)?;
         let netmask = Ipv6Addr::from(nu);
         let network = Ipv6Addr::from(iu & nu);
         let broadcast = Ipv6Addr::from(iu | !nu);

@@ -59,8 +59,8 @@ impl Ipv4AddrNetwork {
     ///
     /// If the netmask is not valid return an `NetAddsError::InvalidNetmaskPrefix(InvalidNetmaskPrefixError)`.
     pub fn try_new (ip: Ipv4Addr, prefix: u8) -> Result<Ipv4AddrNetwork, NetAddsError> {
-        let nu = Self::prefix_to_ip(prefix)?;
         let iu = u32::from(ip);
+        let nu = Self::prefix_to_ip(prefix)?;
         let netmask = Ipv4Addr::from(nu);
         let network = Ipv4Addr::from(iu & nu);
         let broadcast = Ipv4Addr::from(iu | !nu);
