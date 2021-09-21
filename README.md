@@ -3,6 +3,8 @@ Provides IP ranges, networks and iterators for Rust.
 
 ### Documentation
 
+Read documentation [here](https://jumastro.github.io/rust-net-adds).
+
 ### Examples
 > All examples also works with IPv6. Read the documentation for more examples.
 ```rust
