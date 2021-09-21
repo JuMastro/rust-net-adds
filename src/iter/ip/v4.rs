@@ -40,13 +40,29 @@ pub struct Ipv4AddrSmartIterator {
 
 impl Ipv4AddrSmartIterator {
     /// Returns a `Ipv4AddrSmartIterator`.
-    pub fn new (start: Ipv4Addr, end: Ipv4Addr) -> Ipv4AddrSmartIterator {} 
+    pub fn new (start: Ipv4Addr, end: Ipv4Addr) -> Ipv4AddrSmartIterator {
+        let start = u32::from(start);
+        let end = u32::from(end);
+        let updater = if start < end { |x| x + 1 } else { |x| x - 1 };
+        Ipv4AddrSmartIterator {
+            start,
+            end,
+            curr: start.clone(),
+            next: Some(start.clone()),
+            updater
+        }
+    } 
 }
 
 impl Iterator for Ipv4AddrSmartIterator {
     type Item = Ipv4Addr;
 
-    fn next (&mut self) -> Option<Self::Item> {}
+    fn next (&mut self) -> Option<Self::Item> {
+        self.curr = self.next?;
+        let update = self.updater;
+        self.next = if self.curr == self.end { None } else { Some(update(self.curr)) };
+        Some(Ipv4Addr::from(self.curr))
+    }
 }
 
 impl fmt::Display for Ipv4AddrSmartIterator {
@@ -71,5 +87,7 @@ impl From<(Ipv4Addr, Ipv4Addr)> for Ipv4AddrSmartIterator {
     /// assert_eq!(iter.next(), Some(Ipv4Addr::from(1)));
     /// assert_eq!(iter.next(), None);
     /// ```
-    fn from (ips: (Ipv4Addr, Ipv4Addr)) -> Ipv4AddrSmartIterator {}
+    fn from (ips: (Ipv4Addr, Ipv4Addr)) -> Ipv4AddrSmartIterator {
+        Ipv4AddrSmartIterator::new(ips.0, ips.1)
+    }
 }

@@ -54,7 +54,12 @@ impl IpAddrSmartIterator {
     /// let end = Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 2);
     /// assert_eq!(IpAddrSmartIterator::V6(Ipv6AddrSmartIterator::new(start, end)).is_ipv4(), false);
     /// ```
-    pub fn is_ipv4 (&self) -> bool {}
+    pub fn is_ipv4 (&self) -> bool {
+        match self {
+            IpAddrSmartIterator::V4(_) => true,
+            IpAddrSmartIterator::V6(_) => false
+        }
+    }
 
     /// Returns true if the iterator is an IPv6 iterator, else return false.
     ///
@@ -73,13 +78,23 @@ impl IpAddrSmartIterator {
     /// let end = Ipv4Addr::new(0, 0, 0, 2);
     /// assert_eq!(IpAddrSmartIterator::V4(Ipv4AddrSmartIterator::new(start, end)).is_ipv6(), false);
     /// ```
-    pub fn is_ipv6 (&self) -> bool {}
+    pub fn is_ipv6 (&self) -> bool {
+        match self {
+            IpAddrSmartIterator::V4(_) => false,
+            IpAddrSmartIterator::V6(_) => true
+        }
+    }
 }
 
 impl Iterator for IpAddrSmartIterator {
     type Item = IpAddr;
 
-    fn next (&mut self) -> Option<Self::Item> {}
+    fn next (&mut self) -> Option<Self::Item> {
+        match self {
+            IpAddrSmartIterator::V4(iter) => Some(IpAddr::V4(iter.next()?)),
+            IpAddrSmartIterator::V6(iter) => Some(IpAddr::V6(iter.next()?))
+        }
+    }
 }
 
 impl fmt::Display for IpAddrSmartIterator {
@@ -107,7 +122,9 @@ impl From<Ipv4AddrSmartIterator> for IpAddrSmartIterator {
     /// assert_eq!(iter.next(), Some(IpAddr::V4(Ipv4Addr::from(1))));
     /// assert_eq!(iter.next(), None);
     /// ```
-    fn from (iter: Ipv4AddrSmartIterator) -> IpAddrSmartIterator {}
+    fn from (iter: Ipv4AddrSmartIterator) -> IpAddrSmartIterator {
+        IpAddrSmartIterator::V4(iter)
+    }
 }
 
 impl From<Ipv6AddrSmartIterator> for IpAddrSmartIterator {
@@ -126,7 +143,9 @@ impl From<Ipv6AddrSmartIterator> for IpAddrSmartIterator {
     /// assert_eq!(iter.next(), Some(IpAddr::V6(Ipv6Addr::from(1))));
     /// assert_eq!(iter.next(), None);
     /// ```
-    fn from (iter: Ipv6AddrSmartIterator) -> IpAddrSmartIterator {}
+    fn from (iter: Ipv6AddrSmartIterator) -> IpAddrSmartIterator {
+        IpAddrSmartIterator::V6(iter)
+    }
 }
 
 impl From<(IpAddr, IpAddr)> for IpAddrSmartIterator {
@@ -153,7 +172,19 @@ impl From<(IpAddr, IpAddr)> for IpAddrSmartIterator {
     /// assert_eq!(iter.next(), Some(IpAddr::V6(Ipv6Addr::from(1))));
     /// assert_eq!(iter.next(), None);
     /// ```
-    fn from (ips: (IpAddr, IpAddr)) -> IpAddrSmartIterator {}
+    fn from (ips: (IpAddr, IpAddr)) -> IpAddrSmartIterator {
+        match ips {
+            (IpAddr::V4(a), IpAddr::V4(b)) => {
+                IpAddrSmartIterator::V4(Ipv4AddrSmartIterator::new(a, b))
+            },
+            (IpAddr::V6(a), IpAddr::V6(b)) => {
+                IpAddrSmartIterator::V6(Ipv6AddrSmartIterator::new(a, b))
+            },
+            _ => {
+                panic!("cannot mix IPv4 and IPv6 to build a range ip")
+            }
+        }
+    }
 }
 
 impl From<(Ipv4Addr, Ipv4Addr)> for IpAddrSmartIterator {
@@ -172,7 +203,9 @@ impl From<(Ipv4Addr, Ipv4Addr)> for IpAddrSmartIterator {
     /// assert_eq!(iter.next(), Some(IpAddr::V4(Ipv4Addr::from(1))));
     /// assert_eq!(iter.next(), None);
     /// ```
-    fn from (ips: (Ipv4Addr, Ipv4Addr)) -> IpAddrSmartIterator {}
+    fn from (ips: (Ipv4Addr, Ipv4Addr)) -> IpAddrSmartIterator {
+        IpAddrSmartIterator::V4(Ipv4AddrSmartIterator::new(ips.0, ips.1))
+    }
 }
 
 
@@ -192,5 +225,7 @@ impl From<(Ipv6Addr, Ipv6Addr)> for IpAddrSmartIterator {
     /// assert_eq!(iter.next(), Some(IpAddr::V6(Ipv6Addr::from(1))));
     /// assert_eq!(iter.next(), None);
     /// ```
-    fn from (ips: (Ipv6Addr, Ipv6Addr)) -> IpAddrSmartIterator {}
+    fn from (ips: (Ipv6Addr, Ipv6Addr)) -> IpAddrSmartIterator {
+        IpAddrSmartIterator::V6(Ipv6AddrSmartIterator::new(ips.0, ips.1))
+    }
 }

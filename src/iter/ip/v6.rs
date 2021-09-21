@@ -40,13 +40,29 @@ pub struct Ipv6AddrSmartIterator {
 
 impl Ipv6AddrSmartIterator {
     /// Returns a `Ipv6AddrSmartIterator`.
-    pub fn new (start: Ipv6Addr, end: Ipv6Addr) -> Ipv6AddrSmartIterator {} 
+    pub fn new (start: Ipv6Addr, end: Ipv6Addr) -> Ipv6AddrSmartIterator {
+        let start = u128::from(start);
+        let end = u128::from(end);
+        let updater = if start < end { |x| x + 1 } else { |x| x - 1 };
+        Ipv6AddrSmartIterator {
+            start,
+            end,
+            curr: start.clone(),
+            next: Some(start.clone()),
+            updater
+        }
+    } 
 }
 
 impl Iterator for Ipv6AddrSmartIterator {
     type Item = Ipv6Addr;
 
-    fn next (&mut self) -> Option<Self::Item> {}
+    fn next (&mut self) -> Option<Self::Item> {
+        self.curr = self.next?;
+        let update = self.updater;
+        self.next = if self.curr == self.end { None } else { Some(update(self.curr)) };
+        Some(Ipv6Addr::from(self.curr))
+    }
 }
 
 impl fmt::Display for Ipv6AddrSmartIterator {
@@ -71,5 +87,7 @@ impl From<(Ipv6Addr, Ipv6Addr)> for Ipv6AddrSmartIterator {
     /// assert_eq!(iter.next(), Some(Ipv6Addr::from(1)));
     /// assert_eq!(iter.next(), None);
     /// ```
-    fn from (ips: (Ipv6Addr, Ipv6Addr)) -> Ipv6AddrSmartIterator {}
+    fn from (ips: (Ipv6Addr, Ipv6Addr)) -> Ipv6AddrSmartIterator {
+        Ipv6AddrSmartIterator::new(ips.0, ips.1)
+    }
 }

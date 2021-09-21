@@ -38,13 +38,26 @@ pub struct PortSmartIterator {
 
 impl PortSmartIterator {
     /// Returns a `PortSmartIterator`.
-    pub fn new (start: u16, end: u16) -> PortSmartIterator {}
+    pub fn new (start: u16, end: u16) -> PortSmartIterator {
+        PortSmartIterator {
+            start,
+            end,
+            curr: start,
+            next: Some(start),
+            updater: if start < end { |x| x + 1 } else { |x| x - 1 }
+        }
+    }
 }
 
 impl Iterator for PortSmartIterator {
     type Item = u16;
 
-    fn next (&mut self) -> Option<Self::Item> {}
+    fn next (&mut self) -> Option<Self::Item> {
+        self.curr = self.next?;
+        let update = self.updater;
+        self.next = if self.curr == self.end { None } else { Some(update(self.curr)) };
+        Some(self.curr)
+    }
 }
 
 impl fmt::Display for PortSmartIterator {
