@@ -1,6 +1,14 @@
 name: Test
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
 
 env:
   CARGO_TERM_COLOR: always
