@@ -2,10 +2,12 @@ use std::convert::TryFrom;
 use std::fmt;
 use std::net::{IpAddr, Ipv4Addr};
 use std::str::FromStr;
+use std::vec::IntoIter;
 
 use crate::errors::NetAddsError;
 use crate::range::Ipv4AddrRange;
 use crate::network::{NetworkAddrParseError, InvalidNetmaskError, InvalidNetmaskPrefixError};
+use crate::iter::{IntoSmartIterator, Ipv4AddrSmartIterator};
 
 /// An IPv4 address network.
 ///
@@ -394,6 +396,62 @@ impl FromStr for Ipv4AddrNetwork {
         } else {
             Ipv4AddrNetwork::try_new_with_addr(ip.unwrap()?, netmask.unwrap()?)
         }
+    }
+}
+
+impl IntoIterator for Ipv4AddrNetwork {
+    type Item = Ipv4Addr;
+    type IntoIter = IntoIter<Self::Item>;
+
+    /// Create a `Ipv4Addr` iterator. The iterator include the network and the broadcast.
+    ///
+    /// Examples:
+    ///
+    /// ```
+    /// use std::net::Ipv4Addr;
+    ///
+    /// use net_adds::Ipv4AddrNetwork;
+    ///
+    /// let mut iter = Ipv4AddrNetwork::try_new(Ipv4Addr::new(192, 168, 0, 0), 30)
+    ///     .expect("invalid network")
+    ///     .into_iter();
+    ///
+    /// assert_eq!(iter.next(), Some(Ipv4Addr::new(192, 168, 0, 0)));
+    /// assert_eq!(iter.next(), Some(Ipv4Addr::new(192, 168, 0, 1)));
+    /// assert_eq!(iter.next(), Some(Ipv4Addr::new(192, 168, 0, 2)));
+    /// assert_eq!(iter.next(), Some(Ipv4Addr::new(192, 168, 0, 3)));
+    /// assert_eq!(iter.next(), None);
+    /// ```
+    fn into_iter (self) -> Self::IntoIter {
+        self.all().into_iter()
+    }
+}
+
+impl IntoSmartIterator for Ipv4AddrNetwork {
+    type Item = Ipv4Addr;
+    type IntoSmartIter = Ipv4AddrSmartIterator;
+
+    /// Create a smart `Ipv4Addr` iterator. The iterator include the network and the broadcast.
+    ///
+    /// Examples:
+    ///
+    /// ```
+    /// use std::net::Ipv4Addr;
+    ///
+    /// use net_adds::{Ipv4AddrNetwork, IntoSmartIterator};
+    ///
+    /// let mut iter = Ipv4AddrNetwork::try_new(Ipv4Addr::new(192, 168, 0, 0), 30)
+    ///     .expect("invalid network")
+    ///     .into_smart_iter();
+    ///
+    /// assert_eq!(iter.next(), Some(Ipv4Addr::new(192, 168, 0, 0)));
+    /// assert_eq!(iter.next(), Some(Ipv4Addr::new(192, 168, 0, 1)));
+    /// assert_eq!(iter.next(), Some(Ipv4Addr::new(192, 168, 0, 2)));
+    /// assert_eq!(iter.next(), Some(Ipv4Addr::new(192, 168, 0, 3)));
+    /// assert_eq!(iter.next(), None);
+    /// ```
+    fn into_smart_iter (self) -> Self::IntoSmartIter {
+        Ipv4AddrSmartIterator::new(self.network(), self.broadcast())
     }
 }
 
