@@ -1,9 +1,11 @@
 use std::fmt;
 use std::net::Ipv4Addr;
 use std::str::FromStr;
+use std::vec::IntoIter;
 
 use crate::errors::NetAddsError;
 use crate::range::RangeAddrParseError;
+use crate::iter::{IntoSmartIterator, Ipv4AddrSmartIterator};
 
 /// An IPv4 address range.
 ///
@@ -205,6 +207,56 @@ impl FromStr for Ipv4AddrRange {
         } else {
             Ok(Ipv4AddrRange::new(a.unwrap()?, b.unwrap()?))
         }
+    }
+}
+
+impl IntoIterator for Ipv4AddrRange {
+    type Item = Ipv4Addr;
+    type IntoIter = IntoIter<Self::Item>;
+
+    /// Create a `Ipv4Addr` iterator.
+    ///
+    /// Examples:
+    ///
+    /// ```
+    /// use std::net::Ipv4Addr;
+    ///
+    /// use net_adds::Ipv4AddrRange;
+    ///
+    /// let mut iter = Ipv4AddrRange::new(Ipv4Addr::new(0, 0, 0, 0), Ipv4Addr::new(0, 0, 0, 2)).into_iter();
+    ///
+    /// assert_eq!(iter.next(), Some(Ipv4Addr::from(0)));
+    /// assert_eq!(iter.next(), Some(Ipv4Addr::from(1)));
+    /// assert_eq!(iter.next(), Some(Ipv4Addr::from(2)));
+    /// assert_eq!(iter.next(), None);
+    /// ```
+    fn into_iter (self) -> Self::IntoIter {
+        self.all().into_iter()
+    }
+}
+
+impl IntoSmartIterator for Ipv4AddrRange {
+    type Item = Ipv4Addr;
+    type IntoSmartIter = Ipv4AddrSmartIterator;
+
+    /// Create a smart `Ipv4Addr` iterator.
+    ///
+    /// Examples:
+    ///
+    /// ```
+    /// use std::net::Ipv4Addr;
+    ///
+    /// use net_adds::{Ipv4AddrRange, IntoSmartIterator};
+    ///
+    /// let mut iter = Ipv4AddrRange::new(Ipv4Addr::new(0, 0, 0, 0), Ipv4Addr::new(0, 0, 0, 2)).into_smart_iter();
+    ///
+    /// assert_eq!(iter.next(), Some(Ipv4Addr::from(0)));
+    /// assert_eq!(iter.next(), Some(Ipv4Addr::from(1)));
+    /// assert_eq!(iter.next(), Some(Ipv4Addr::from(2)));
+    /// assert_eq!(iter.next(), None);
+    /// ```
+    fn into_smart_iter (self) -> Self::IntoSmartIter {
+        Ipv4AddrSmartIterator::new(self.start, self.end)
     }
 }
 

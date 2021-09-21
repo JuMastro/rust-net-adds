@@ -1,9 +1,11 @@
 use std::fmt;
 use std::net::Ipv6Addr;
 use std::str::FromStr;
+use std::vec::IntoIter;
 
 use crate::errors::NetAddsError;
 use crate::range::RangeAddrParseError;
+use crate::iter::{IntoSmartIterator, Ipv6AddrSmartIterator};
 
 /// An IPv6 address range.
 ///
@@ -207,6 +209,60 @@ impl FromStr for Ipv6AddrRange {
         } else {
             Ok(Ipv6AddrRange::new(a.unwrap()?, b.unwrap()?))
         }
+    }
+}
+
+impl IntoIterator for Ipv6AddrRange {
+    type Item = Ipv6Addr;
+    type IntoIter = IntoIter<Self::Item>;
+
+    /// Create a `Ipv6Addr` iterator.
+    ///
+    /// Examples:
+    ///
+    /// ```
+    /// use std::net::Ipv6Addr;
+    ///
+    /// use net_adds::Ipv6AddrRange;
+    ///
+    /// let a = Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 1);
+    /// let b = Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 3);
+    /// let mut iter = Ipv6AddrRange::new(a, b).into_iter();
+    ///
+    /// assert_eq!(iter.next(), Some(Ipv6Addr::from(1)));
+    /// assert_eq!(iter.next(), Some(Ipv6Addr::from(2)));
+    /// assert_eq!(iter.next(), Some(Ipv6Addr::from(3)));
+    /// assert_eq!(iter.next(), None);
+    /// ```
+    fn into_iter (self) -> Self::IntoIter {
+        self.all().into_iter()
+    }
+}
+
+impl IntoSmartIterator for Ipv6AddrRange {
+    type Item = Ipv6Addr;
+    type IntoSmartIter = Ipv6AddrSmartIterator;
+
+    /// Create a smart `Ipv6Addr` iterator.
+    ///
+    /// Examples:
+    ///
+    /// ```
+    /// use std::net::Ipv6Addr;
+    ///
+    /// use net_adds::{Ipv6AddrRange, IntoSmartIterator};
+    ///
+    /// let a = Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 1);
+    /// let b = Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 3);
+    /// let mut iter = Ipv6AddrRange::new(a, b).into_smart_iter();
+    ///
+    /// assert_eq!(iter.next(), Some(Ipv6Addr::from(1)));
+    /// assert_eq!(iter.next(), Some(Ipv6Addr::from(2)));
+    /// assert_eq!(iter.next(), Some(Ipv6Addr::from(3)));
+    /// assert_eq!(iter.next(), None);
+    /// ```
+    fn into_smart_iter (self) -> Self::IntoSmartIter {
+        Ipv6AddrSmartIterator::new(self.start, self.end)
     }
 }
 

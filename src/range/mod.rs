@@ -1,8 +1,10 @@
 use std::fmt;
 use std::net::IpAddr;
 use std::str::FromStr;
+use std::vec::IntoIter;
 
 use crate::errors::NetAddsError;
+use crate::iter::{IntoSmartIterator, IpAddrSmartIterator, Ipv4AddrSmartIterator, Ipv6AddrSmartIterator};
 
 mod v4;
 pub use v4::*;
@@ -289,6 +291,81 @@ impl FromStr for IpAddrRange {
         Ipv4AddrRange::from_str(s)
             .map(IpAddrRange::V4)
             .or_else(move |_| Ipv6AddrRange::from_str(s).map(IpAddrRange::V6))
+    }
+}
+
+impl IntoIterator for IpAddrRange {
+    type Item = IpAddr;
+    type IntoIter = IntoIter<Self::Item>;
+
+    /// Create a `IpAddr` iterator.
+    ///
+    /// Examples:
+    ///
+    /// ```
+    /// use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
+    ///
+    /// use net_adds::{IpAddrRange, Ipv4AddrRange, Ipv6AddrRange};
+    ///
+    /// let a = Ipv4Addr::new(0, 0, 0, 0);
+    /// let b = Ipv4Addr::new(0, 0, 0, 1);
+    /// let mut iter = IpAddrRange::V4(Ipv4AddrRange::new(a, b)).into_iter();
+    ///
+    /// assert_eq!(iter.next(), Some(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0))));
+    /// assert_eq!(iter.next(), Some(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 1))));
+    /// assert_eq!(iter.next(), None);
+    ///
+    /// let a = Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 0);
+    /// let b = Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 1);
+    /// let mut iter = IpAddrRange::V6(Ipv6AddrRange::new(a, b)).into_iter();
+    ///
+    /// assert_eq!(iter.next(), Some(IpAddr::V6(Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 0))));
+    /// assert_eq!(iter.next(), Some(IpAddr::V6(Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 1))));
+    /// assert_eq!(iter.next(), None);
+    /// ```
+    fn into_iter (self) -> Self::IntoIter {
+        self.all().into_iter()
+    }
+}
+
+impl IntoSmartIterator for IpAddrRange {
+    type Item = IpAddr;
+    type IntoSmartIter = IpAddrSmartIterator;
+
+    /// Create a smart `IpAddr` iterator.
+    ///
+    /// Examples:
+    ///
+    /// ```
+    /// use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
+    ///
+    /// use net_adds::{IpAddrRange, Ipv4AddrRange, Ipv6AddrRange, IntoSmartIterator};
+    ///
+    /// let a = Ipv4Addr::new(0, 0, 0, 0);
+    /// let b = Ipv4Addr::new(0, 0, 0, 1);
+    /// let mut iter = IpAddrRange::V4(Ipv4AddrRange::new(a, b)).into_smart_iter();
+    ///
+    /// assert_eq!(iter.next(), Some(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0))));
+    /// assert_eq!(iter.next(), Some(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 1))));
+    /// assert_eq!(iter.next(), None);
+    ///
+    /// let a = Ipv6Addr::from(0x0);
+    /// let b = Ipv6Addr::from(0x1);
+    /// let mut iter = IpAddrRange::V6(Ipv6AddrRange::new(a, b)).into_smart_iter();
+    ///
+    /// assert_eq!(iter.next(), Some(IpAddr::V6(Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 0))));
+    /// assert_eq!(iter.next(), Some(IpAddr::V6(Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 1))));
+    /// assert_eq!(iter.next(), None);
+    /// ```
+    fn into_smart_iter (self) -> Self::IntoSmartIter {
+        match self {
+            IpAddrRange::V4(v4) => {
+                IpAddrSmartIterator::V4(Ipv4AddrSmartIterator::new(v4.start(), v4.end()))
+            },
+            IpAddrRange::V6(v6) => {
+                IpAddrSmartIterator::V6(Ipv6AddrSmartIterator::new(v6.start(), v6.end()))
+            }
+        }
     }
 }
 
