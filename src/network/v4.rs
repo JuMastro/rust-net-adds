@@ -108,7 +108,7 @@ impl Ipv4AddrNetwork {
 
     /// Returns all ip of the network including the network and the broadcast addr.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv4Addr;
@@ -130,7 +130,7 @@ impl Ipv4AddrNetwork {
 
     /// Returns all hosts (exclude network & broadcast addr).
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv4Addr;
@@ -153,7 +153,7 @@ impl Ipv4AddrNetwork {
 
     /// Returns the number of ip's included in the network including the network and the broadcast addr.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv4Addr;
@@ -170,7 +170,7 @@ impl Ipv4AddrNetwork {
 
     /// Returns true if the ip argument is included in the network, else returns false.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv4Addr;
@@ -196,7 +196,7 @@ impl Ipv4AddrNetwork {
     ///
     /// If the netmask is not valid return an `NetAddsError::InvalidNetmask(InvalidNetmaskError)`.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv4Addr;
@@ -221,7 +221,7 @@ impl Ipv4AddrNetwork {
     ///
     /// If the netmask prefix is not valid return an `NetAddsError::InvalidNetmaskPrefix(InvalidNetmaskPrefixError)`.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv4Addr;
@@ -244,7 +244,7 @@ impl Ipv4AddrNetwork {
     ///
     /// If the netmask prefix is not valid return an `NetAddsError::InvalidNetmaskPrefix(InvalidNetmaskPrefixError)`.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv4Addr;
@@ -271,7 +271,7 @@ impl Ipv4AddrNetwork {
     ///
     /// If the netmask is not valid return an `NetAddsError::InvalidNetmask(InvalidNetmaskError)`.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv4Addr;
@@ -311,7 +311,7 @@ impl TryFrom<(Ipv4Addr, u8)> for Ipv4AddrNetwork {
     ///
     /// If the netmask prefix is not valid return an `NetAddsError::InvalidNetmaskPrefix(InvalidNetmaskPrefixError)`.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::convert::TryFrom;
@@ -335,7 +335,7 @@ impl TryFrom<(Ipv4Addr, Ipv4Addr)> for Ipv4AddrNetwork {
 
     /// Create an `Ipv4AddrNetwork` from a tuple of two `Ipv4Addr`.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::convert::TryFrom;
@@ -363,7 +363,7 @@ impl FromStr for Ipv4AddrNetwork {
     ///
     /// If the string representation is not valid return an `NetAddsErrorAddrParse(NetworkAddrParseError)`.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv4Addr;
@@ -405,7 +405,7 @@ impl IntoIterator for Ipv4AddrNetwork {
 
     /// Create a `Ipv4Addr` iterator. The iterator include the network and the broadcast.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv4Addr;
@@ -433,7 +433,7 @@ impl IntoSmartIterator for Ipv4AddrNetwork {
 
     /// Create a smart `Ipv4Addr` iterator. The iterator include the network and the broadcast.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv4Addr;

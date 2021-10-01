@@ -103,7 +103,7 @@ impl IpAddrRange {
 
     /// Returns the number of ip's included in the range.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
@@ -127,7 +127,7 @@ impl IpAddrRange {
     ///
     /// Panic if IPv4 and IPv6 are mixed.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
@@ -223,7 +223,7 @@ impl fmt::Display for IpAddrRange {
 impl From<Ipv4AddrRange> for IpAddrRange {
     /// Create an `IpAddrRange::V4` from an `Ipv4AddrRange`.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv4Addr;
@@ -243,7 +243,7 @@ impl From<Ipv4AddrRange> for IpAddrRange {
 impl From<Ipv6AddrRange> for IpAddrRange {
     /// Create an `IpAddrRange::V6` from an `Ipv6AddrRange`.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv6Addr;
@@ -268,7 +268,7 @@ impl FromStr for IpAddrRange {
     ///
     /// If the string representation is not valid return an `NetAddsError::RangeAddrParse(RangeAddrParseError)`.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
@@ -300,7 +300,7 @@ impl IntoIterator for IpAddrRange {
 
     /// Create a `IpAddr` iterator.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
@@ -334,7 +334,7 @@ impl IntoSmartIterator for IpAddrRange {
 
     /// Create a smart `IpAddr` iterator.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};

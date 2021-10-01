@@ -74,7 +74,7 @@ impl fmt::Display for Ipv4AddrSmartIterator {
 impl From<(Ipv4Addr, Ipv4Addr)> for Ipv4AddrSmartIterator {
     /// Create an `Ipv4AddrSmartIterator` from a tuple `(Ipv4Addr, Ipv4Addr)`.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv4Addr;

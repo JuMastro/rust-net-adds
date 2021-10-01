@@ -108,7 +108,7 @@ impl Ipv6AddrNetwork {
 
     /// Returns all ip of the network including the network and the broadcast addr.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv6Addr;
@@ -130,7 +130,7 @@ impl Ipv6AddrNetwork {
 
     /// Returns all hosts (exclude network & broadcast addr).
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv6Addr;
@@ -153,7 +153,7 @@ impl Ipv6AddrNetwork {
 
     /// Returns the number of ip's included in the network including the network and the broadcast addr.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv6Addr;
@@ -170,7 +170,7 @@ impl Ipv6AddrNetwork {
 
     /// Returns true if the ip argument is included in the network, else returns false.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv6Addr;
@@ -196,7 +196,7 @@ impl Ipv6AddrNetwork {
     ///
     /// If the netmask is not valid return an `NetAddsError::InvalidNetmask(InvalidNetmaskError)`.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv6Addr;
@@ -221,7 +221,7 @@ impl Ipv6AddrNetwork {
     ///
     /// If the netmask prefix is not valid return an `NetAddsError::InvalidNetmaskPrefix(InvalidNetmaskPrefixError)`.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv6Addr;
@@ -244,7 +244,7 @@ impl Ipv6AddrNetwork {
     ///
     /// If the netmask prefix is not valid return an `NetAddsError::InvalidNetmaskPrefix(InvalidNetmaskPrefixError)`.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv6Addr;
@@ -270,7 +270,7 @@ impl Ipv6AddrNetwork {
     ///
     /// If the netmask IPv6 is not valid return an `NetAddsError::InvalidNetmask(InvalidNetmaskError)`.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv6Addr;
@@ -314,7 +314,7 @@ impl TryFrom<(Ipv6Addr, u8)> for Ipv6AddrNetwork {
     ///
     /// If the netmask prefix is not valid return an `NetAddsError::InvalidNetmaskPrefix(InvalidNetmaskPrefixError)`.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::convert::TryFrom;
@@ -338,7 +338,7 @@ impl TryFrom<(Ipv6Addr, Ipv6Addr)> for Ipv6AddrNetwork {
 
     /// Create an `Ipv6AddrNetwork` from a tuple of two `Ipv6Addr`.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::convert::TryFrom;
@@ -366,7 +366,7 @@ impl FromStr for Ipv6AddrNetwork {
     ///
     /// If the string representation is not valid return an `NetAddsError::NetworkAddrParse(NetworkAddrParseError)`.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::convert::TryFrom;
@@ -409,7 +409,7 @@ impl IntoIterator for Ipv6AddrNetwork {
 
     /// Create a `Ipv6Addr` iterator. The iterator include the network and the broadcast.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv6Addr;
@@ -437,7 +437,7 @@ impl IntoSmartIterator for Ipv6AddrNetwork {
 
     /// Create a smart `Ipv6Addr` iterator. The iterator include the network and the broadcast.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv6Addr;

@@ -74,7 +74,7 @@ impl fmt::Display for Ipv6AddrSmartIterator {
 impl From<(Ipv6Addr, Ipv6Addr)> for Ipv6AddrSmartIterator {
     /// Create an `Ipv6AddrSmartIterator` from a tuple `(Ipv6Addr, Ipv6Addr)`.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv6Addr;

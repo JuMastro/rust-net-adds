@@ -100,7 +100,7 @@ impl IpAddrNetwork {
 
     /// Returns all ip of the network including the network and the broadcast addr.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
@@ -134,7 +134,7 @@ impl IpAddrNetwork {
 
     /// Returns all hosts (exclude network & broadcast addr).
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
@@ -164,7 +164,7 @@ impl IpAddrNetwork {
 
     /// Returns the number of ip's included in the network including the network and the broadcast addr.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
@@ -188,7 +188,7 @@ impl IpAddrNetwork {
     ///
     /// Panic if IPv4 and IPv6 are mixed.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
@@ -276,7 +276,7 @@ impl fmt::Display for IpAddrNetwork {
 impl From<Ipv4AddrNetwork> for IpAddrNetwork {
     /// Create an `IpAddrNetwork::V4` from an `Ipv4AddrNetwork`.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv4Addr;
@@ -295,7 +295,7 @@ impl From<Ipv4AddrNetwork> for IpAddrNetwork {
 impl From<Ipv6AddrNetwork> for IpAddrNetwork {
     /// Create an `IpAddrNetwork::V6` from an `Ipv6AddrNetwork`.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv6Addr;
@@ -318,7 +318,7 @@ impl FromStr for IpAddrNetwork {
     /// 
     /// If the string representation is not valid return an `NetAddsErrorAddrParse(NetworkAddrParseError)`.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
@@ -350,7 +350,7 @@ impl IntoIterator for IpAddrNetwork {
 
     /// Create a `IpAddr` iterator.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
@@ -387,7 +387,7 @@ impl IntoSmartIterator for IpAddrNetwork {
 
     /// Create a smart `IpAddr` iterator.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};

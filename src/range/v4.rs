@@ -83,7 +83,7 @@ impl Ipv4AddrRange {
 
     /// Returns the number of ip's included in the range.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv4Addr;
@@ -111,7 +111,7 @@ impl Ipv4AddrRange {
 
     /// Returns true if the ip argument is included in the range, else returns false.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv4Addr;
@@ -158,7 +158,7 @@ impl fmt::Display for Ipv4AddrRange {
 impl From<(Ipv4Addr, Ipv4Addr)> for Ipv4AddrRange {
     /// Create an `Ipv4AddrRange` from a tuple of two `Ipv4Addr`.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv4Addr;
@@ -182,7 +182,7 @@ impl FromStr for Ipv4AddrRange {
     ///
     /// If the string representation is not valid return an `NetAddsError::RangeAddrParse(RangeAddrParseError)`.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv4Addr;
@@ -216,7 +216,7 @@ impl IntoIterator for Ipv4AddrRange {
 
     /// Create a `Ipv4Addr` iterator.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv4Addr;
@@ -241,7 +241,7 @@ impl IntoSmartIterator for Ipv4AddrRange {
 
     /// Create a smart `Ipv4Addr` iterator.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv4Addr;

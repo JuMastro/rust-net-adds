@@ -5,6 +5,12 @@ Provides IP ranges, networks and iterators for Rust.
 
 Read documentation [here](https://jumastro.github.io/rust-net-adds).
 
+### Install
+```toml
+[dependencies]
+net-adds = { git = "https://github.com/JuMastro/rust-net-adds", version = "0.1.0" }
+```
+
 ### Examples
 > All examples also works with IPv6. Read the documentation for more examples.
 ```rust

@@ -109,7 +109,7 @@ impl fmt::Display for IpAddrSmartIterator {
 impl From<Ipv4AddrSmartIterator> for IpAddrSmartIterator {
     /// Create an `IpAddrSmartIterator::V4` from an `Ipv4AddrSmartIterator`.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::{IpAddr, Ipv4Addr};
@@ -130,7 +130,7 @@ impl From<Ipv4AddrSmartIterator> for IpAddrSmartIterator {
 impl From<Ipv6AddrSmartIterator> for IpAddrSmartIterator {
     /// Create an `IpAddrSmartIterator::V6` from an `Ipv6AddrSmartIterator`.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::{IpAddr, Ipv6Addr};
@@ -153,7 +153,7 @@ impl From<(IpAddr, IpAddr)> for IpAddrSmartIterator {
     ///
     /// Panic if IPv4 and IPv6 are mixed.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
@@ -190,7 +190,7 @@ impl From<(IpAddr, IpAddr)> for IpAddrSmartIterator {
 impl From<(Ipv4Addr, Ipv4Addr)> for IpAddrSmartIterator {
     /// Create an `IpAddrSmartIterator` from a tuple `(Ipv4Addr, Ipv4Addr)`.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::{IpAddr, Ipv4Addr};
@@ -212,7 +212,7 @@ impl From<(Ipv4Addr, Ipv4Addr)> for IpAddrSmartIterator {
 impl From<(Ipv6Addr, Ipv6Addr)> for IpAddrSmartIterator {
     /// Create an `IpAddrSmartIterator` from a tuple `(Ipv6Addr, Ipv6Addr)`.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::{IpAddr, Ipv6Addr};

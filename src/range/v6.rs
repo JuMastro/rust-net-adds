@@ -83,7 +83,7 @@ impl Ipv6AddrRange {
 
     /// Returns the number of ip's included in the range.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv6Addr;
@@ -111,7 +111,7 @@ impl Ipv6AddrRange {
 
     /// Returns true if the ip argument is included in the range, else returns false.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv6Addr;
@@ -158,7 +158,7 @@ impl fmt::Display for Ipv6AddrRange {
 impl From<(Ipv6Addr, Ipv6Addr)> for Ipv6AddrRange {
     /// Create an `Ipv6AddrRange` from a tuple of two `Ipv6Addr`.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv6Addr;
@@ -182,7 +182,7 @@ impl FromStr for Ipv6AddrRange {
     ///
     /// If the string representation is not valid return an `NetAddsError::RangeAddrParse(RangeAddrParseError)`.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv6Addr;
@@ -218,7 +218,7 @@ impl IntoIterator for Ipv6AddrRange {
 
     /// Create a `Ipv6Addr` iterator.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv6Addr;
@@ -245,7 +245,7 @@ impl IntoSmartIterator for Ipv6AddrRange {
 
     /// Create a smart `Ipv6Addr` iterator.
     ///
-    /// Examples:
+    /// # Examples:
     ///
     /// ```
     /// use std::net::Ipv6Addr;
