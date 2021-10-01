@@ -14,8 +14,9 @@ net-adds = { git = "https://github.com/JuMastro/rust-net-adds", version = "0.1.0
 ### Examples
 > All examples also works with IPv6. Read the documentation for more examples.
 ```rust
+use std::net::Ipv4Addr;
+
 use net_adds::{
-    Ipv4Addr,
     Ipv4AddrRange,
     Ipv4AddrNetwork,
     IntoSmartIterator,

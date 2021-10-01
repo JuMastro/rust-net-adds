@@ -1,6 +1,3 @@
-// Re-export std addr to allow single line `use`.
-pub use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
-
 pub mod errors;
 pub use errors::*;
 
